@@ -7,7 +7,7 @@ if(POLICY CMP0054)
 endif()
 
 # ---[ Caffe project
-project(Caffe C CXX)
+project(my-very-deep-caffe C CXX)
 
 # ---[ Caffe version
 set(CAFFE_TARGET_VERSION "1.0.0-rc3" CACHE STRING "Caffe logical version")
