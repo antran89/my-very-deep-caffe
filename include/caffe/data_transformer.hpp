@@ -147,6 +147,9 @@ class DataTransformer {
   Phase phase_;
   Blob<Dtype> data_mean_;
   vector<Dtype> mean_values_;
+
+  vector<float> custom_scale_ratios_;
+  int max_distort_;
 };
 
 }  // namespace caffe
