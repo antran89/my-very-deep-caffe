@@ -303,7 +303,7 @@ bool ReadSegmentFlowToDatum(const string& filename, const int label,
             sprintf(tmp,"flow_y_%04d.jpg",int(file_id+offset));
             string filename_y = filename + "/" + tmp;
             cv::Mat cv_img_origin_y = cv::imread(filename_y, CV_LOAD_IMAGE_GRAYSCALE);
-            if (!cv_img_origin_x.data || !cv_img_origin_y.data){
+            if (!cv_img_origin_x.data || !cv_img_origin_y.data) {
                 LOG(ERROR) << "Could not load file " << filename_x << " or " << filename_y;
                 return false;
             }
@@ -322,6 +322,7 @@ bool ReadSegmentFlowToDatum(const string& filename, const int label,
                 datum->set_label(label);
                 datum->clear_data();
                 datum->clear_float_data();
+                datum->set_encoded(false);
                 datum_string = datum->mutable_data();
             }
             for (int h = 0; h < cv_img_x.rows; ++h){
@@ -329,8 +330,8 @@ bool ReadSegmentFlowToDatum(const string& filename, const int label,
                     datum_string->push_back(static_cast<char>(cv_img_x.at<uchar>(h,w)));
                 }
             }
-            for (int h = 0; h < cv_img_y.rows; ++h){
-                for (int w = 0; w < cv_img_y.cols; ++w){
+            for (int h = 0; h < cv_img_y.rows; ++h) {
+                for (int w = 0; w < cv_img_y.cols; ++w) {
                     datum_string->push_back(static_cast<char>(cv_img_y.at<uchar>(h,w)));
                 }
             }
