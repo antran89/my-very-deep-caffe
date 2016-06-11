@@ -91,6 +91,7 @@ void FlowDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     // get a datum
     Datum& datum = *(reader_.full().pop("Waiting for flow data"));
     read_time += timer.MicroSeconds();
+//    DLOG(INFO) << "number of data in full queue: " << reader_.full().size();
     timer.Start();
     // Apply data transformations (mirror, scale, crop...)
     int offset = batch->data_.offset(item_id);
