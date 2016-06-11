@@ -306,7 +306,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 145 (last added: video_data_param)
+// LayerParameter next available layer-specific ID: 146 (last added: flow_data_param)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -368,6 +368,7 @@ message LayerParameter {
   optional EmbedParameter embed_param = 137;
   optional ExpParameter exp_param = 111;
   optional FlattenParameter flatten_param = 135;
+  optional FlowDataParameter flow_data_param = 145;
   optional HDF5DataParameter hdf5_data_param = 112;
   optional HDF5OutputParameter hdf5_output_param = 113;
   optional HingeLossParameter hinge_loss_param = 114;
@@ -398,7 +399,7 @@ message LayerParameter {
   optional VideoDataParameter video_data_param = 144;
 }
 
-message VideoDataParameter{
+message VideoDataParameter {
   // Specify the data source.
   optional string source = 1;
   // Specify the batch size.
@@ -433,6 +434,53 @@ message VideoDataParameter{
   }
   optional Modality modality = 13 [default = FLOW];
 }
+
+// data layer to read Flow Data
+message FlowDataParameter {
+  enum DB {
+      LEVELDB = 0;
+      LMDB = 1;
+  }
+
+  // Specify the data source.
+  optional string source = 1;
+  // Specify the batch size.
+  optional uint32 batch_size = 4;
+  // The rand_skip variable is for the data layer to skip a few data points
+  // to avoid all asynchronous sgd clients to start at the same point. The skip
+  // point would be set as rand_skip * rand(0,1). Note that rand_skip should not
+  // be larger than the number of keys in the leveldb.
+  optional uint32 rand_skip = 7 [default = 0];
+  // Whether or not ImageLayer should shuffle the list of files at every epoch.
+  optional bool shuffle = 8 [default = false];
+  // It will also resize images if new_height or new_width are not zero.
+  optional uint32 new_height = 9 [default = 0];
+  optional uint32 new_width = 10 [default = 0];
+  optional uint32 new_length = 11 [default = 1];
+  optional uint32 num_segments = 12 [default = 1];
+  // DEPRECATED. See TransformationParameter. For data pre-processing, we can do
+  // simple scaling and subtracting the data mean, if provided. Note that the
+  // mean subtraction is always carried out before scaling.
+  optional float scale = 2 [default = 1];
+  optional string mean_file = 3;
+  // DEPRECATED. See TransformationParameter. Specify if we would like to randomly
+  // crop an image.
+  optional uint32 crop_size = 5 [default = 0];
+  // DEPRECATED. See TransformationParameter. Specify if we want to randomly mirror
+  // data.
+  optional bool mirror = 6 [default = false];
+  enum Modality {
+    RGB = 0;
+    FLOW = 1;
+    FOREGROUND_SALIENCY = 2;
+  }
+  optional Modality modality = 13 [default = FLOW];
+  optional DB backend = 14 [default = LEVELDB];
+  // Prefetch queue (Number of batches to prefetch to host memory, increase if
+  // data access bandwidth varies).
+  optional uint32 prefetch = 15 [default = 4];
+}
+
 
 // Message that stores parameters used to apply transformation
 // to the data layer's data
@@ -473,6 +521,10 @@ message TransformationParameter {
 
   //if set to true, it is optical flow field
   optional bool is_flow = 14 [default = false];
+
+  // new height, width for resizing image or datum in a DataTransformer
+  optional int32 new_height = 16 [default = 0];
+  optional int32 new_width = 17 [default = 0];
 }
 
 // Message that stores parameters shared by loss layers

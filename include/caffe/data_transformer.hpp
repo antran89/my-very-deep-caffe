@@ -127,6 +127,21 @@ class DataTransformer {
   vector<int> InferBlobShape(const cv::Mat& cv_img);
 #endif  // USE_OPENCV
 
+  /**
+   * @brief Applies the transformation defined in the data layer's
+   * transform_param block to the data. This TransformVariedSizeDatum()
+   * function is different with the original Transform() function that it
+   * can process varied height and width of images in datum. For example,
+   * images can be resized before saving them into a database.
+   *
+   * @param datum
+   *    Datum containing the data to be transformed.
+   * @param transformed_blob
+   *    This is destination blob. It can be part of top blob's data if
+   *    set_cpu_data() is used. See data_layer.cpp for an example.
+   */
+  void TransformVariedSizeDatum(const Datum& datum, Blob<Dtype>* transformed_blob);
+
  protected:
    /**
    * @brief Generates a random integer from Uniform({0, 1, ..., n-1}).
@@ -138,7 +153,11 @@ class DataTransformer {
    */
   virtual int Rand(int n);
 
+  // protected functions
   void Transform(const Datum& datum, Dtype* transformed_data);
+
+  void TransformVariedSizeDatum(const Datum& datum, Dtype* transformed_data);
+
   // Tranformation parameters
   TransformationParameter param_;
 

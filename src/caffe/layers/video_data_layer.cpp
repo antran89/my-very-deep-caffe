@@ -90,7 +90,7 @@ void VideoDataLayer<Dtype>:: DataLayerSetUp(const vector<Blob<Dtype>*>& bottom, 
 }
 
 template <typename Dtype>
-void VideoDataLayer<Dtype>::ShuffleVideos(){
+void VideoDataLayer<Dtype>::ShuffleVideos() {
     caffe::rng_t* prefetch_rng1 = static_cast<caffe::rng_t*>(prefetch_rng_1_->generator());
     caffe::rng_t* prefetch_rng2 = static_cast<caffe::rng_t*>(prefetch_rng_2_->generator());
     shuffle(lines_.begin(), lines_.end(), prefetch_rng1);
@@ -98,7 +98,7 @@ void VideoDataLayer<Dtype>::ShuffleVideos(){
 }
 
 template <typename Dtype>
-void VideoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch){
+void VideoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     Datum datum;
     CPUTimer batch_timer;
     batch_timer.Start();
@@ -126,7 +126,7 @@ void VideoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch){
         CHECK_GT(lines_size, lines_id_);
         vector<int> offsets;
         int average_duration = (int) lines_duration_[lines_id_] / num_segments;
-        for (int i = 0; i < num_segments; ++i){
+        for (int i = 0; i < num_segments; ++i) {
             if (this->phase_==TRAIN){
                 caffe::rng_t* frame_rng = static_cast<caffe::rng_t*>(frame_prefetch_rng_->generator());
                 int offset = (*frame_rng)() % (average_duration - new_length + 1);
