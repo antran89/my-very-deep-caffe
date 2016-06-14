@@ -140,8 +140,22 @@ void FlowDataReader::Body::InternalThreadEntry() {
   }
 }
 
-// modify read_one function to trim video into a length
 void FlowDataReader::Body::read_one(db::Cursor* cursor, QueuePair* qp) {
+  Datum* datum = qp->free_.pop();
+  // TODO deserialize in-place instead of copy?
+  datum->ParseFromString(cursor->value());
+  qp->full_.push(datum);
+
+  // go to the next iter
+  cursor->Next();
+  if (!cursor->valid()) {
+    DLOG(INFO) << "Restarting data prefetching from start.";
+    cursor->SeekToFirst();
+  }
+}
+
+// modify read_one function to trim video into a length
+void FlowDataReader::Body::read_one_varied_length_datum(db::Cursor* cursor, QueuePair* qp) {
   CPUTimer read_one_timer;
   read_one_timer.Start();
   CPUTimer timer;

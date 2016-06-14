@@ -53,6 +53,7 @@ class FlowDataReader {
 
    protected:
     void InternalThreadEntry();
+    void read_one_varied_length_datum(db::Cursor* cursor, QueuePair* qp);
     void read_one(db::Cursor* cursor, QueuePair* qp);
 
     const LayerParameter param_;
