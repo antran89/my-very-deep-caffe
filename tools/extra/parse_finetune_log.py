@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 """
-Parse training log
+Parse finetune training log
 
-Evolved from parse_log.sh
+Evolved from parse_log.py
 """
 
 import os
