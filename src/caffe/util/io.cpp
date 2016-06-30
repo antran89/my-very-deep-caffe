@@ -340,14 +340,14 @@ bool ReadSegmentFlowToDatum(const string& filename, const int label,
     return true;
 }
 
-bool ReadSegmentRGBFlowToDatum(const string& filename, const int label,
+bool ReadSegmentColorFlowToDatum(const string& filename, const int label,
     const vector<int> offsets, const int height, const int width, const int length, Datum* datum, bool is_color) {
     cv::Mat cv_img;
     string* datum_string;
     char tmp[30];
     int cv_read_flag = (is_color ? CV_LOAD_IMAGE_COLOR :
         CV_LOAD_IMAGE_GRAYSCALE);
-    for (int i = 0; i < offsets.size(); ++i){
+    for (int i = 0; i < offsets.size(); ++i) {
         int offset = offsets[i];
         for (int file_id = 1; file_id < length+1; ++file_id){
             sprintf(tmp,"flow_%04d.jpg",int(file_id+offset));
