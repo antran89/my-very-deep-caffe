@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
     }
 
     offsets[0] = lines[line_id].second.first - 1;
-    status = ReadSegmentRGBFlowToDatum(lines[line_id].first.c_str(), lines[line_id].second.second, offsets,
+    status = ReadSegmentColorFlowToDatum(lines[line_id].first.c_str(), lines[line_id].second.second, offsets,
                                     resize_height, resize_width, new_length, &datum, true);
 
     if (status == false) continue;
