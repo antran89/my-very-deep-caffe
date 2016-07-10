@@ -94,7 +94,7 @@ int feature_extraction_pipeline(int argc, char** argv) {
     	const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net
         ->blob_by_name(string(argv[k]));
     	int num_features = feature_blob->num();
-        assert(num_features == num_expected_features);
+        CHECK_EQ(num_features, num_expected_features);
 
         // save average features into a binary file
         for (int n = 0; n < batch_size; ++n) {
