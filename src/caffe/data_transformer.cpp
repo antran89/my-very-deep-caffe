@@ -100,8 +100,6 @@ void fillCropSize(int input_height, int input_width,
 template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const Datum& datum,
                                        Dtype* transformed_data) {
-
-
   const string& data = datum.data();
   const int datum_channels = datum.channels();
   const int datum_height = datum.height();
@@ -488,7 +486,6 @@ void DataTransformer<Dtype>::TransformVariedSizeDatum(const Datum& datum,
 
         for (int h = 0; h < height; ++h) {
             for (int w = 0; w < width; ++w) {
-                data_index = (c * datum_height + h_off + h) * datum_width + w_off + w;
                 if (do_mirror) {
                     top_index = (c * height + h) * width + (width - 1 - w);
                 } else {
@@ -590,7 +587,7 @@ void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
 
     const int crop_size = param_.crop_size();
     const Dtype scale = param_.scale();
-    const bool do_mirror = param_.mirror() && Rand(2);
+    bool do_mirror = param_.mirror();
     const bool has_uint8 = data.size() > 0;
     const bool has_mean_values = mean_values_.size() > 0;
     const bool do_multi_scale = param_.multi_scale();
@@ -619,6 +616,9 @@ void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
         LOG(ERROR)<< "Multi scale augmentation is only activated with crop_size set.";
     }
 
+    if (!do_mirror)
+        LOG(ERROR) << "TransformVariedSizeTestDatum is applicable only if mirror is set to true";
+
     int height = new_height;
     int width = new_width;
 
@@ -629,9 +629,16 @@ void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
     bool need_imgproc = false;
 
     // start sampling 10-view of a datum
-    assert(offset_pairs.size() == caffe::CAFFE_NUM_TEST_VIEWS);
+    int offset_pos = -1;
 
     for (int view_ind = 0; view_ind < caffe::CAFFE_NUM_TEST_VIEWS; view_ind++) {
+        // initialize offset_pos and do_mirror
+        if (view_ind % 2 == 0) {
+            offset_pos++;
+            do_mirror = false;
+        } else
+            do_mirror = true;
+
         if (crop_size) {
             height = crop_size;
             width = crop_size;
@@ -650,8 +657,9 @@ void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
                 // fill offsets for fix_crop
                 fillFixOffset(new_height, new_width, crop_height, crop_width,
                               param_.more_fix_crop(), offset_pairs);
-                h_off = offset_pairs[view_ind].first;
-                w_off = offset_pairs[view_ind].second;
+                CHECK_EQ(offset_pairs.size(), caffe::CAFFE_NUM_TEST_VIEWS/2);
+                h_off = offset_pairs[offset_pos].first;
+                w_off = offset_pairs[offset_pos].second;
             } else {
                 h_off = Rand(new_height - crop_height + 1);
                 w_off = Rand(new_width - crop_width + 1);
@@ -731,9 +739,9 @@ void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
                 }
             }
         }
-
     }
 
+    CHECK_EQ(offset_pos + 1, caffe::CAFFE_NUM_TEST_VIEWS/2);
     multi_scale_bufferM.release();
 }
 
