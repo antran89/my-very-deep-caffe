@@ -25,12 +25,14 @@
 #include "caffe/blob.hpp"
 #include "caffe/common.hpp"
 #include "caffe/net.hpp"
-//#include "caffe/vision_layers.hpp"
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/io.hpp"
-#include "caffe/util/image_io.hpp"
+#include "caffe/layers/video_test_data_layer.hpp"
 
 using namespace caffe;  // NOLINT(build/namespaces)
+
+template <typename Dtype>
+bool save_average_features_to_binary(Blob<Dtype>* blob, const string fn_blob, int num_index);
 
 template<typename Dtype>
 int feature_extraction_pipeline(int argc, char** argv);
@@ -47,8 +49,8 @@ int feature_extraction_pipeline(int argc, char** argv) {
   uint batch_size = atoi(argv[4]);
   uint num_mini_batches = atoi(argv[5]);
   char* fn_feat = argv[6];
+  int num_expected_features = caffe::CAFFE_NUM_TEST_VIEWS * batch_size;
 
-//  Caffe::set_phase(Caffe::TEST);
   if (device_id>=0){
 	  Caffe::set_mode(Caffe::GPU);
 	  Caffe::SetDevice(device_id);
@@ -92,15 +94,18 @@ int feature_extraction_pipeline(int argc, char** argv) {
     	const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net
         ->blob_by_name(string(argv[k]));
     	int num_features = feature_blob->num();
+        assert(num_features == num_expected_features);
 
-        for (int n = 0; n < num_features; ++n) {
-          if (list_prefix.size() > n) {
+        // save average features into a binary file
+        for (int n = 0; n < batch_size; ++n) {
+          if (list_prefix.size()>n) {
               // This is a bad condition! It might be wrong if the batch_size argument in cmd line is set wrong.
               // But this condition is good for guarding again the last features that are not enough for a batch.
               // The feature extraction of last batch is correct only when using with LDMB database, because of
               // load_batch() function.
         	  string fn_feat = list_prefix[n] + string(".") + string(argv[k]);
-        	  save_blob_to_binary(feature_blob.get(), fn_feat, n);
+              //save_blob_to_binary(feature_blob.get(), fn_feat, n);
+              save_average_features_to_binary(feature_blob.get(), fn_feat, n);
           }
         }
     }
@@ -115,4 +120,68 @@ int feature_extraction_pipeline(int argc, char** argv) {
   return 0;
 }
 
+
+template <>
+bool save_average_features_to_binary<float>(Blob<float>* blob, const string fn_blob, int num_index)
+{
+    FILE *f;
+    float *buff;
+    int num, channel, length, width, height;
+    f = fopen(fn_blob.c_str(), "wb");
+    if (f==NULL)
+        return false;
+
+    if (num_index<0){
+        num = blob->shape(0);
+        buff = blob->mutable_cpu_data();
+    }else{
+        num = 1;
+        vector<int> indices(1, 0);
+        indices[0] = num_index;
+        buff = blob->mutable_cpu_data() + blob->offset(indices);
+    }
+    channel = blob->shape(1);
+    if (blob->shape().size() > 2) {
+        length = blob->shape(2);
+        height = blob->shape(3);
+        width = blob->shape(4);
+    } else {
+        length = 1;
+        height = 1;
+        width = 1;
+    }
+
+    int avg_buff_size = num * channel * length * height * width;
+    int num_views = caffe::CAFFE_NUM_TEST_VIEWS;
+
+    // average features from different views
+    float *avg_buff = new float[avg_buff_size];
+    for (int n = 0; n < num; n++)
+        for (int c = 0; c < channel; c++)
+            for (int l = 0; l < length; l++)
+                for (int h = 0; h < height; h++)
+                    for (int w = 0; w < width; w++)
+                    {
+                        int avg_index = ((n * channel + c) * height + h) * width + w;
+                        float sum_val = 0;
+                        for (int v = 0; v < num_views; v++)
+                        {
+                            int buff_index = (((n * num_views + v) * channel + c) * height + h) * width + w;
+                            sum_val += buff[buff_index];
+                        }
+                        // avaraging
+                        avg_buff[avg_index] = sum_val / num_views;
+                    }
+
+    fwrite(&num, sizeof(int), 1, f);
+    fwrite(&channel, sizeof(int), 1, f);
+    fwrite(&length, sizeof(int), 1, f);
+    fwrite(&height, sizeof(int), 1, f);
+    fwrite(&width, sizeof(int), 1, f);
+    fwrite(avg_buff, sizeof(float), avg_buff_size, f);
+    fclose(f);
+    delete avg_buff;
+
+    return true;
+}
 

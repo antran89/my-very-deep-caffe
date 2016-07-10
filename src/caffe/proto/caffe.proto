@@ -400,6 +400,8 @@ message LayerParameter {
   optional VideoSegmentDataParameter video_segment_data_param = 146;
 }
 
+// Video Data Layer mainly from Wang Limin's tools
+// Randomly sample starting frame
 message VideoDataParameter {
   // Specify the data source.
   optional string source = 1;
@@ -436,6 +438,8 @@ message VideoDataParameter {
   optional Modality modality = 13 [default = FLOW];
 }
 
+// Similar to VideoData, but without random starting frame
+// Instead, we provide a text file to specify segments of frames for the video.
 message VideoSegmentDataParameter {
   // Specify the data source.
   optional string source = 1;
@@ -473,7 +477,8 @@ message VideoSegmentDataParameter {
   optional Modality modality = 13 [default = FLOW];
 }
 
-// data layer to read Flow Data
+// data layer to read FlowData from LMDB database
+// The video is segmented and converted into LDMB format.
 message FlowDataParameter {
   enum DB {
       LEVELDB = 0;
@@ -542,13 +547,13 @@ message TransformationParameter {
   // Force the decoded image to have 1 color channels.
   optional bool force_gray = 7 [default = false];
 
-  //if set to true,
-  //instead using a fixed position cropping (center, left-up, left-down, right-up, right-down)
+  // if set to true,
+  // instead using a fixed position cropping (center, left-up, left-down, right-up, right-down)
   optional bool fix_crop = 10 [default = false];
-  //turn on to use stronger augmentation
+  // turn on to use stronger augmentation
   optional bool more_fix_crop = 15 [default = false];
 
-  //if set to true, use multi-scale data augmentation
+  // if set to true, use multi-scale data augmentation
   optional bool multi_scale = 11 [default = false];
 
   // a list of float numbers less than 1 for multiple scales
@@ -557,7 +562,7 @@ message TransformationParameter {
   // maximal tolerated aspect ratio mismatch in the ratio list
   optional int32 max_distort = 13 [default = 1];
 
-  //if set to true, it is optical flow field
+  // if set to true, it is optical flow field
   optional bool is_flow = 14 [default = false];
 
   // new height, width for resizing image or datum in a DataTransformer
