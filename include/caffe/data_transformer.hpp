@@ -142,6 +142,18 @@ class DataTransformer {
    */
   void TransformVariedSizeDatum(const Datum& datum, Blob<Dtype>* transformed_blob);
 
+  /**
+   * @brief Similar to tranformations in TransformVariedSizeDatum, but output a blob
+   * with 10 views for testing.
+   *
+   * @param datum
+   *    Datum containing the data to be transformed.
+   * @param transformed_blob
+   *    This is destination blob. It can be part of top blob's data if
+   * set_cpu_data() is used.
+   */
+  void TransformVariedSizeTestDatum(const Datum& datum, Blob<Dtype>* transformed_blob);
+
  protected:
    /**
    * @brief Generates a random integer from Uniform({0, 1, ..., n-1}).
@@ -157,6 +169,8 @@ class DataTransformer {
   void Transform(const Datum& datum, Dtype* transformed_data);
 
   void TransformVariedSizeDatum(const Datum& datum, Dtype* transformed_data);
+
+  void TransformVariedSizeTestDatum(const Datum& datum, Dtype* transformed_data);
 
   // Tranformation parameters
   TransformationParameter param_;

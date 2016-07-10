@@ -11,6 +11,7 @@
 #include "caffe/util/io.hpp"
 #include "caffe/util/math_functions.hpp"
 #include "caffe/util/rng.hpp"
+#include "caffe/layers/video_test_data_layer.hpp"
 
 namespace caffe {
 
@@ -529,6 +530,210 @@ void DataTransformer<Dtype>::TransformVariedSizeDatum(const Datum& datum,
             }
         }
     }
+    multi_scale_bufferM.release();
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
+                                       Blob<Dtype>* transformed_blob) {
+  // If datum is encoded, decoded and transform the cv::image.
+  if (datum.encoded()) {
+#ifdef USE_OPENCV
+    CHECK(!(param_.force_color() && param_.force_gray()))
+        << "cannot set both force_color and force_gray";
+    cv::Mat cv_img;
+    if (param_.force_color() || param_.force_gray()) {
+    // If force_color then decode in color otherwise decode in gray.
+      cv_img = DecodeDatumToCVMat(datum, param_.force_color());
+    } else {
+      cv_img = DecodeDatumToCVMatNative(datum);
+    }
+    // Transform the cv::image into blob.
+    return Transform(cv_img, transformed_blob);
+#else
+    LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
+#endif  // USE_OPENCV
+  } else {
+    if (param_.force_color() || param_.force_gray()) {
+      LOG(ERROR) << "force_color and force_gray only for encoded datum";
+    }
+  }
+
+  const int crop_size = param_.crop_size();
+  const int datum_channels = datum.channels();
+
+  // Check dimensions.
+  const int channels = transformed_blob->channels();
+  const int height = transformed_blob->height();
+  const int width = transformed_blob->width();
+  const int num = transformed_blob->num();
+
+  CHECK_EQ(channels, datum_channels);
+  CHECK_GE(num, 1);
+
+  if (crop_size) {
+    CHECK_EQ(crop_size, height);
+    CHECK_EQ(crop_size, width);
+  }
+
+  Dtype* transformed_data = transformed_blob->mutable_cpu_data();
+  TransformVariedSizeTestDatum(datum, transformed_data);
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
+                                                      Dtype* transformed_data) {
+    const string& data = datum.data();
+    const int datum_channels = datum.channels();
+    const int datum_height = datum.height();
+    const int datum_width = datum.width();
+
+    const int crop_size = param_.crop_size();
+    const Dtype scale = param_.scale();
+    const bool do_mirror = param_.mirror() && Rand(2);
+    const bool has_uint8 = data.size() > 0;
+    const bool has_mean_values = mean_values_.size() > 0;
+    const bool do_multi_scale = param_.multi_scale();
+    const int new_height = param_.new_height();
+    const int new_width = param_.new_width();
+    vector<pair<int, int> > offset_pairs;
+    vector<pair<int, int> > crop_size_pairs;
+    cv::Mat newM, multi_scale_bufferM;
+
+    CHECK_GT(datum_channels, 0);
+    CHECK_GE(new_height, crop_size);
+    CHECK_GE(new_width, crop_size);
+
+    if (has_mean_values) {
+        CHECK(mean_values_.size() == 1 || mean_values_.size() == datum_channels) <<
+            "Specify either 1 mean_value or as many as channels: " << datum_channels;
+        if (datum_channels > 1 && mean_values_.size() == 1) {
+            // Replicate the mean_value for simplicity
+            for (int c = 1; c < datum_channels; ++c) {
+                mean_values_.push_back(mean_values_[0]);
+            }
+        }
+    }
+
+    if (!crop_size && do_multi_scale) {
+        LOG(ERROR)<< "Multi scale augmentation is only activated with crop_size set.";
+    }
+
+    int height = new_height;
+    int width = new_width;
+
+    int h_off = 0;
+    int w_off = 0;
+    int crop_height = 0;
+    int crop_width = 0;
+    bool need_imgproc = false;
+
+    // start sampling 10-view of a datum
+    assert(offset_pairs.size() == caffe::CAFFE_NUM_TEST_VIEWS);
+
+    for (int view_ind = 0; view_ind < caffe::CAFFE_NUM_TEST_VIEWS; view_ind++) {
+        if (crop_size) {
+            height = crop_size;
+            width = crop_size;
+            // We can do both random crop & multi-scale cropping in TEST time.
+            if (do_multi_scale) {
+                fillCropSize(new_height, new_width, crop_size, crop_size, crop_size_pairs,
+                             max_distort_, custom_scale_ratios_);
+                int sel = Rand(crop_size_pairs.size());
+                crop_height = crop_size_pairs[sel].first;
+                crop_width = crop_size_pairs[sel].second;
+            }else{
+                crop_height = crop_size;
+                crop_width = crop_size;
+            }
+            if (param_.fix_crop()) {
+                // fill offsets for fix_crop
+                fillFixOffset(new_height, new_width, crop_height, crop_width,
+                              param_.more_fix_crop(), offset_pairs);
+                h_off = offset_pairs[view_ind].first;
+                w_off = offset_pairs[view_ind].second;
+            } else {
+                h_off = Rand(new_height - crop_height + 1);
+                w_off = Rand(new_width - crop_width + 1);
+            }
+        }
+
+        need_imgproc = do_multi_scale && crop_size && ((crop_height != crop_size) || (crop_width != crop_size));
+
+        Dtype datum_element;
+        int top_index, data_index;
+        for (int c = 0; c < datum_channels; ++c) {
+            cv::Mat M(datum_height, datum_width, has_uint8?CV_8UC1:CV_32FC1);
+
+            //put the datum content to a cvMat
+            for (int h = 0; h < datum_height; ++h) {
+                for (int w = 0; w < datum_width; ++w) {
+                    int data_index = (c * datum_height + h) * datum_width + w;
+                    if (has_uint8) {
+                        M.at<uchar>(h, w) = static_cast<uint8_t>(data[data_index]);
+                    }else{
+                        M.at<float>(h, w) = datum.float_data(data_index);
+                    }
+                }
+            }
+            // resize image to new_height and new_width
+            cv::resize(M, newM, cv::Size(new_width, new_height));
+
+            // crop resize etc needed
+            if (need_imgproc){
+                //resize the cropped patch to network input size
+                cv::Mat cropM(newM, cv::Rect(w_off, h_off, crop_width, crop_height));
+                cv::resize(cropM, multi_scale_bufferM, cv::Size(crop_size, crop_size));
+                cropM.release();
+            }
+
+            for (int h = 0; h < height; ++h) {
+                for (int w = 0; w < width; ++w) {
+                    data_index = (c * datum_height + h_off + h) * datum_width + w_off + w;
+                    // recalculate top_index
+                    if (do_mirror) {
+                        top_index = ((view_ind * datum_channels + c) * height + h) * width + (width - 1 - w);
+                    } else {
+                        top_index = ((view_ind * datum_channels + c) * height + h) * width + w;
+                    }
+                    if (need_imgproc) {
+                        if (has_uint8) {
+                            if (param_.is_flow() && do_mirror && c%2 == 0)
+                                datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
+                            else
+                                datum_element = static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
+                        } else {
+                            if (param_.is_flow() && do_mirror && c%2 == 0)
+                                datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
+                            else
+                                datum_element = static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
+                        }
+                    } else {
+                        if (has_uint8) {
+                            if (param_.is_flow() && do_mirror && c%2 == 0)
+                                datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h, w));
+                            else
+                                datum_element = static_cast<Dtype>(newM.at<uint8_t>(h, w));
+                        } else {
+                            if (param_.is_flow() && do_mirror && c%2 == 0)
+                                datum_element = 255 - static_cast<Dtype>(newM.at<float>(h, w));
+                            else
+                                datum_element = static_cast<Dtype>(newM.at<float>(h, w));
+                        }
+                    }
+
+                    if (has_mean_values) {
+                        transformed_data[top_index] =
+                                (datum_element - mean_values_[c]) * scale;
+                    } else {
+                        transformed_data[top_index] = datum_element * scale;
+                    }
+                }
+            }
+        }
+
+    }
+
     multi_scale_bufferM.release();
 }
 

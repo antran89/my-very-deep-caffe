@@ -152,7 +152,7 @@ void VideoSegmentDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         if (lines_id_ >= lines_size) {
             DLOG(INFO) << "Restarting data prefetching from start.";
             lines_id_ = 0;
-            if(this->layer_param_.video_segment_data_param().shuffle()){
+            if (this->layer_param_.video_segment_data_param().shuffle()){
                 ShuffleVideos();
             }
         }

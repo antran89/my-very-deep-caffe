@@ -18,6 +18,7 @@ namespace caffe {
  * @brief Provides data to the Net from image files.
  *
  * TODO(dox): thorough documentation for Forward and proto params.
+ * This is the VideoSegmentDataLayer
  */
 template <typename Dtype>
 class VideoSegmentDataLayer : public BasePrefetchingDataLayer<Dtype> {

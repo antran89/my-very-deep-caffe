@@ -266,7 +266,7 @@ bool save_blob_to_binary<float>(Blob<float>* blob, const string fn_blob, int num
 }
 
 template <>
-bool save_blob_to_binary<double>(Blob<double>* blob, const string fn_blob, int num_index){
+bool save_blob_to_binary<double>(Blob<double>* blob, const string fn_blob, int num_index) {
 	FILE *f;
 	double *buff;
 	int n, c, l, w, h;
@@ -279,12 +279,20 @@ bool save_blob_to_binary<double>(Blob<double>* blob, const string fn_blob, int n
 		buff = blob->mutable_cpu_data();
 	}else{
 		n = 1;
-		buff = blob->mutable_cpu_data() + blob->offset(num_index);
+        vector<int> indices(1, 0);
+        indices[0] = num_index;
+        buff = blob->mutable_cpu_data() + blob->offset(indices);
 	}
     c = blob->shape(1);
-    l = blob->shape(2);
-    h = blob->shape(3);
-    w = blob->shape(4);
+    if (blob->shape().size() > 2) {
+        l = blob->shape(2);
+        h = blob->shape(3);
+        w = blob->shape(4);
+    } else {
+        l = 1;
+        h = 1;
+        w = 1;
+    }
 
 	fwrite(&n, sizeof(int), 1, f);
 	fwrite(&c, sizeof(int), 1, f);
@@ -295,6 +303,4 @@ bool save_blob_to_binary<double>(Blob<double>* blob, const string fn_blob, int n
 	fclose(f);
 	return true;
 }
-
-
 }

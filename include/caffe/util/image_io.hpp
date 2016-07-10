@@ -56,7 +56,6 @@ inline bool save_blob_to_binary(Blob<Dtype>* blob, const string fn_blob){
 	return save_blob_to_binary(blob, fn_blob, -1);
 }
 
-
 }  // namespace caffe
 
 
