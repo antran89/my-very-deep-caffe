@@ -192,10 +192,10 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
   for (int c = 0; c < datum_channels; ++c) {
 
     // image resize etc needed
-    if (need_imgproc){
+    if (need_imgproc) {
       cv::Mat M(datum_height, datum_width, has_uint8?CV_8UC1:CV_32FC1);
 
-      //put the datum content to a cvMat
+      // put the datum content to a cvMat
       for (int h = 0; h < datum_height; ++h) {
         for (int w = 0; w < datum_width; ++w) {
           int data_index = (c * datum_height + h) * datum_width + w;
@@ -471,6 +471,7 @@ void DataTransformer<Dtype>::TransformVariedSizeDatum(const Datum& datum,
                 }
             }
         }
+
         // resize image to new_height and new_width
         cv::resize(M, newM, cv::Size(new_width, new_height));
 //        cv::imshow("flow image", newM);
@@ -491,8 +492,8 @@ void DataTransformer<Dtype>::TransformVariedSizeDatum(const Datum& datum,
                 } else {
                     top_index = (c * height + h) * width + w;
                 }
-                if (need_imgproc){
-                    if (has_uint8){
+                if (need_imgproc) {
+                    if (has_uint8) {
                         if (param_.is_flow() && do_mirror && c%2 == 0)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                         else
@@ -503,17 +504,17 @@ void DataTransformer<Dtype>::TransformVariedSizeDatum(const Datum& datum,
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                     }
-                }else {
+                } else {
                     if (has_uint8) {
                         if (param_.is_flow() && do_mirror && c%2 == 0)
-                            datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h, w));
+                            datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                         else
-                            datum_element = static_cast<Dtype>(newM.at<uint8_t>(h, w));
+                            datum_element = static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                     } else {
                         if (param_.is_flow() && do_mirror && c%2 == 0)
-                            datum_element = 255 - static_cast<Dtype>(newM.at<float>(h, w));
+                            datum_element = 255 - static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
                         else
-                            datum_element = static_cast<Dtype>(newM.at<float>(h, w));
+                            datum_element = static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
                     }
                 }
 
@@ -719,14 +720,14 @@ void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
                     } else {
                         if (has_uint8) {
                             if (param_.is_flow() && do_mirror && c%2 == 0)
-                                datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h, w));
+                                datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                             else
-                                datum_element = static_cast<Dtype>(newM.at<uint8_t>(h, w));
+                                datum_element = static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                         } else {
                             if (param_.is_flow() && do_mirror && c%2 == 0)
-                                datum_element = 255 - static_cast<Dtype>(newM.at<float>(h, w));
+                                datum_element = 255 - static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
                             else
-                                datum_element = static_cast<Dtype>(newM.at<float>(h, w));
+                                datum_element = static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
                         }
                     }
 

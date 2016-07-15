@@ -149,7 +149,7 @@ void FlowDataReader::Body::read_one(db::Cursor* cursor, QueuePair* qp) {
   // go to the next iter
   cursor->Next();
   if (!cursor->valid()) {
-    DLOG(INFO) << "Restarting data prefetching from start.";
+    LOG(INFO) << "Restarting data prefetching from start.";
     cursor->SeekToFirst();
   }
 }
