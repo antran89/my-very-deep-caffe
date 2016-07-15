@@ -129,7 +129,10 @@ int main(int argc, char** argv) {
     status = ReadSegmentFlowToDatum(lines[line_id].first.c_str(), lines[line_id].second.second, offsets,
                                     resize_height, resize_width, new_length, &datum);
 
-    if (status == false) continue;
+    if (status == false) {
+        LOG(FATAL) << "Failed to read flows from file: " <<  lines[line_id].first.c_str();
+        return -1;      // not reachable, just for safe
+    }
     if (check_size) {
       if (!data_size_initialized) {
         data_size = datum.channels() * datum.height() * datum.width();

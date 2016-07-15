@@ -54,11 +54,11 @@ int feature_extraction_pipeline(int argc, char** argv) {
   if (device_id>=0){
 	  Caffe::set_mode(Caffe::GPU);
 	  Caffe::SetDevice(device_id);
-	  LOG(ERROR) << "Using GPU #" << device_id;
+      LOG(INFO) << "Using GPU #" << device_id;
   }
   else{
 	  Caffe::set_mode(Caffe::CPU);
-	  LOG(ERROR) << "Using CPU";
+      LOG(INFO) << "Using CPU";
   }
 
   shared_ptr<Net<Dtype> > feature_extraction_net(
@@ -71,7 +71,7 @@ int feature_extraction_pipeline(int argc, char** argv) {
       << " in the network " << string(net_proto);
   }
 
-  LOG(ERROR)<< "Extracting features for " << num_mini_batches << " batches";
+  LOG(INFO)<< "Extracting features for " << num_mini_batches << " batches";
   std::ifstream infile(fn_feat);
   string feat_prefix;
   std::vector<string> list_prefix;
@@ -111,11 +111,11 @@ int feature_extraction_pipeline(int argc, char** argv) {
     }
     image_index += list_prefix.size();
     if (batch_index % 100 == 0) {
-        LOG(ERROR)<< "Extracted features of " << image_index <<
+        LOG(INFO)<< "Extracted features of " << image_index <<
             " images.";
     }
   }
-  LOG(ERROR)<< "Successfully extracted " << image_index << " features!";
+  LOG(INFO)<< "Successfully extracted " << image_index << " features!";
   infile.close();
   return 0;
 }
