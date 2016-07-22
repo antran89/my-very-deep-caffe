@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
             << data.size();
       }
     }
-    // sequential
+    // prepending zeros in front of integral number to keep the datum in sequential order
     string key_str = caffe::format_int(line_id, 8);
 
     // Put in db
