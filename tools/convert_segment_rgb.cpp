@@ -7,7 +7,7 @@
 // This program converts a set of images to a lmdb/leveldb by storing them
 // as Datum proto buffers.
 // Usage:
-//   convert_segment_flow [FLAGS] LISTFILE DB_NAME
+//   convert_segment_rgb [FLAGS] LISTFILE DB_NAME
 //
 // where ROOTFOLDER is the root folder that holds all the images, and LISTFILE
 // should be a list of files as well as their labels, in the format as
@@ -126,8 +126,8 @@ int main(int argc, char** argv) {
     }
 
     offsets[0] = lines[line_id].second.first - 1;
-    status = ReadSegmentFlowToDatum(lines[line_id].first.c_str(), lines[line_id].second.second, offsets,
-                                    resize_height, resize_width, new_length, &datum);
+    status = ReadSegmentRGBToDatum(lines[line_id].first.c_str(), lines[line_id].second.second, offsets,
+                                    resize_height, resize_width, new_length, &datum, is_color);
 
     if (status == false) {
         LOG(FATAL) << "Failed to read flows from file: " <<  lines[line_id].first.c_str();
@@ -151,7 +151,7 @@ int main(int argc, char** argv) {
     CHECK(datum.SerializeToString(&out));
     txn->Put(key_str, out);
 
-    if (++count % 100 == 0) {
+    if (++count % 1000 == 0) {
       // Commit db
       txn->Commit();
       txn.reset(db->NewTransaction());
@@ -159,7 +159,7 @@ int main(int argc, char** argv) {
     }
   }
   // write the last batch
-  if (count % 100 != 0) {
+  if (count % 1000 != 0) {
     txn->Commit();
     LOG(INFO) << "Processed " << count << " files.";
   }
