@@ -1,3 +1,9 @@
+# Fork of Caffe
+**This is a fork used for video action recognition, mainly two-stream CNN networks.**
+Some un-official layers developed or merged into this repo:
+	0. FlowData layer: use a FlowData Reader to read flow data from LDMB database.
+	0. Modified DataTransformer methods: which can read images from resized images, rescale back and then do transformations.
+
 # Caffe
 
 [![Build Status](https://travis-ci.org/BVLC/caffe.svg?branch=master)](https://travis-ci.org/BVLC/caffe)
