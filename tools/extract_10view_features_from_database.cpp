@@ -131,13 +131,16 @@ bool save_average_features_to_binary<float>(Blob<float>* blob, const string fn_b
     if (f==NULL)
         return false;
 
+    const int num_views = caffe::CAFFE_NUM_TEST_VIEWS;
+
     if (num_index<0){
         num = blob->shape(0);
         buff = blob->mutable_cpu_data();
     }else{
         num = 1;
         vector<int> indices(1, 0);
-        indices[0] = num_index;
+        // [IMPORTANT] need to multiply num_views to have correct indexes
+        indices[0] = num_index * num_views;
         buff = blob->mutable_cpu_data() + blob->offset(indices);
     }
     channel = blob->shape(1);
@@ -152,7 +155,6 @@ bool save_average_features_to_binary<float>(Blob<float>* blob, const string fn_b
     }
 
     int avg_buff_size = num * channel * length * height * width;
-    int num_views = caffe::CAFFE_NUM_TEST_VIEWS;
 
     // average features from different views
     float *avg_buff = new float[avg_buff_size];
