@@ -658,7 +658,7 @@ void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
                 // fill offsets for fix_crop
                 fillFixOffset(new_height, new_width, crop_height, crop_width,
                               param_.more_fix_crop(), offset_pairs);
-                CHECK_EQ(offset_pairs.size(), caffe::CAFFE_NUM_TEST_VIEWS/2);
+//                CHECK_EQ(offset_pairs.size(), caffe::CAFFE_NUM_TEST_VIEWS/2);
                 h_off = offset_pairs[offset_pos].first;
                 w_off = offset_pairs[offset_pos].second;
             } else {
@@ -742,7 +742,7 @@ void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
         }
     }
 
-    CHECK_EQ(offset_pos + 1, caffe::CAFFE_NUM_TEST_VIEWS/2);
+    //CHECK_EQ(offset_pos + 1, caffe::CAFFE_NUM_TEST_VIEWS/2);
     multi_scale_bufferM.release();
 }
 
