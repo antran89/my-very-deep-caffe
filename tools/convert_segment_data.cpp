@@ -50,6 +50,7 @@ DEFINE_string(encode_type, "",
     "Optional: What type should we encode the image as ('png','jpg',...).");
 DEFINE_int32(new_length, 16, "Length of a video flow segment feeding into data layer");
 DEFINE_int32(sampling_rate, 1, "Sampling rate to get video frames");
+DEFINE_bool(is_flow, false, "Whether the data is flow or rgb images");
 
 int main(int argc, char** argv) {
 #ifdef USE_OPENCV
@@ -78,6 +79,7 @@ int main(int argc, char** argv) {
   const bool check_size = FLAGS_check_size;
   const bool encoded = FLAGS_encoded;
   const string encode_type = FLAGS_encode_type;
+  const bool is_flow = FLAGS_is_flow;
 
   std::ifstream infile(argv[1]);
   std::vector< std::pair<std::string, std::pair<int, int> > > lines;
@@ -126,8 +128,12 @@ int main(int argc, char** argv) {
     }
 
     offsets[0] = lines[line_id].second.first - 1;
-    status = ReadSegmentRGBToDatum(lines[line_id].first.c_str(), lines[line_id].second.second, offsets,
-                                    resize_height, resize_width, new_length, &datum, is_color);
+    if (is_flow)
+        status = ReadSegmentFlowToDatum(lines[line_id].first.c_str(), lines[line_id].second.second, offsets,
+                                        resize_height, resize_width, new_length, &datum);
+    else
+        status = ReadSegmentRGBToDatum(lines[line_id].first.c_str(), lines[line_id].second.second, offsets,
+                                        resize_height, resize_width, new_length, &datum, is_color);
 
     if (status == false) {
         LOG(FATAL) << "Failed to read flows from file: " <<  lines[line_id].first.c_str();
@@ -151,7 +157,7 @@ int main(int argc, char** argv) {
     CHECK(datum.SerializeToString(&out));
     txn->Put(key_str, out);
 
-    if (++count % 1000 == 0) {
+    if (++count % 100 == 0) {
       // Commit db
       txn->Commit();
       txn.reset(db->NewTransaction());
@@ -159,7 +165,7 @@ int main(int argc, char** argv) {
     }
   }
   // write the last batch
-  if (count % 1000 != 0) {
+  if (count % 100 != 0) {
     txn->Commit();
     LOG(INFO) << "Processed " << count << " files.";
   }
