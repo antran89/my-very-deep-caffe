@@ -55,6 +55,10 @@ int main(int argc, char** argv) {
     }
 
     const bool is_color = !FLAGS_gray;
+    if (is_color)
+        LOG(INFO) << "Computing mean values from color image database";
+    else
+        LOG(INFO) << "Computing mean values from gray image database";
 
     scoped_ptr<db::DB> db(db::GetDB(FLAGS_backend));
     db->Open(argv[1], db::READ);
@@ -176,16 +180,21 @@ int main(int argc, char** argv) {
     }
 
     std::vector<float> mean_values(mean_image_channels, 0.0);
-    for (int c = 0; c < mean_image_channels; ++c) {
+    for (int c = 0; c < mean_image_channels; c++) {
         for (int h = 0; h < height; h++) {
             for (int w = 0; w < width; w++)
                 if (is_color)
                     mean_values[c] += mean_image.at<cv::Vec3f>(h, w)[c];
                 else
-                    mean_values[c] = mean_image.at<float>(h, w);
+                    mean_values[c] += mean_image.at<float>(h, w);
         }
         LOG(INFO) << "mean_value channel [" << c << "]: " << mean_values[c] / dim;
     }
+    float acc = 0.0f;
+    for (int c = 0; c < mean_image_channels; c++) {
+        acc += mean_values[c];
+    }
+    LOG(INFO) << "overall mean value: " << acc/mean_image_channels;
 #else
     LOG(FATAL) << "This tool requires OpenCV; compile with USE_OPENCV.";
 #endif  // USE_OPENCV
