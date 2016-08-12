@@ -179,6 +179,7 @@ int main(int argc, char** argv) {
         cv::imwrite(argv[3], save_img);
     }
 
+    // compute mean value for each channel
     std::vector<float> mean_values(mean_image_channels, 0.0);
     for (int c = 0; c < mean_image_channels; c++) {
         for (int h = 0; h < height; h++) {
@@ -188,13 +189,14 @@ int main(int argc, char** argv) {
                 else
                     mean_values[c] += mean_image.at<float>(h, w);
         }
-        LOG(INFO) << "mean_value channel [" << c << "]: " << mean_values[c] / dim;
+        mean_values[c] /= dim;
+        LOG(INFO) << "mean_value channel [" << c << "]: " << mean_values[c];
     }
-    float acc = 0.0f;
+    float acc = 0;
     for (int c = 0; c < mean_image_channels; c++) {
         acc += mean_values[c];
     }
-    LOG(INFO) << "overall mean value: " << acc/mean_image_channels;
+    LOG(INFO) << "single mean value: " << acc/mean_image_channels;
 #else
     LOG(FATAL) << "This tool requires OpenCV; compile with USE_OPENCV.";
 #endif  // USE_OPENCV
