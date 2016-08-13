@@ -179,15 +179,17 @@ int main(int argc, char** argv) {
         cv::imwrite(argv[3], save_img);
     }
 
-    // compute mean value for each channel
-    std::vector<float> mean_values(mean_image_channels, 0.0);
-    for (int c = 0; c < mean_image_channels; c++) {
+    // compute mean value for each channel of average blob
+    LOG(INFO) << "number of channels in each blob: " << num_channels;
+    std::vector<float> mean_values(num_channels, 0.0);
+    for (int c = 0; c < num_channels; c++) {
+        int start_ind = dim * c;
+        int ind = 0;
         for (int h = 0; h < height; h++) {
-            for (int w = 0; w < width; w++)
-                if (is_color)
-                    mean_values[c] += mean_image.at<cv::Vec3f>(h, w)[c];
-                else
-                    mean_values[c] += mean_image.at<float>(h, w);
+            for (int w = 0; w < width; w++) {
+                mean_values[c] += avg_blob.data(start_ind + ind);
+                ind++;
+            }
         }
         mean_values[c] /= dim;
         LOG(INFO) << "mean_value channel [" << c << "]: " << mean_values[c];
