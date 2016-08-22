@@ -134,9 +134,9 @@ bool save_average_features_to_binary<float>(Blob<float>* blob, const string fn_b
     const int num_views = caffe::CAFFE_NUM_TEST_VIEWS;
 
     if (num_index<0){
-        num = blob->shape(0);
+        num = blob->shape(0) / num_views;   // [IMPORTANT] divide num_views number
         buff = blob->mutable_cpu_data();
-    }else{
+    } else {
         num = 1;
         vector<int> indices(1, 0);
         // [IMPORTANT] need to multiply num_views to have correct indexes
