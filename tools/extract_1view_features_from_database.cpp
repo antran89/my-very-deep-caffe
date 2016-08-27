@@ -69,7 +69,7 @@ int feature_extraction_pipeline(int argc, char** argv) {
       << " in the network " << string(net_proto);
   }
 
-  LOG(ERROR)<< "Extracting features for " << num_mini_batches << " batches";
+  LOG(INFO)<< "Extracting features for " << num_mini_batches << " batches";
   std::ifstream infile(fn_feat);
   string feat_prefix;
   std::vector<string> list_prefix;
@@ -92,6 +92,7 @@ int feature_extraction_pipeline(int argc, char** argv) {
     	const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net
         ->blob_by_name(string(argv[k]));
     	int num_features = feature_blob->num();
+        CHECK_EQ(num_features, batch_size) << "Number of features in a batch must be equal to batch size";
 
         for (int n = 0; n < num_features; ++n) {
           if (list_prefix.size() > n) {
