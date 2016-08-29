@@ -245,10 +245,15 @@ bool save_blob_to_binary<float>(Blob<float>* blob, const string fn_blob, int num
         buff = blob->mutable_cpu_data() + blob->offset(indices);
 	}
     c = blob->shape(1);
-    if (blob->shape().size() > 2) {
+    // adapt the shape of blob to [N, C, L, W, H] format
+    if (blob->shape().size() > 4) {
         l = blob->shape(2);
         h = blob->shape(3);
         w = blob->shape(4);
+    } else if (blob->shape().size() > 2) {
+        l = 1;
+        h = blob->shape(2);
+        w = blob->shape(3);
     } else {
         l = 1;
         h = 1;
@@ -284,10 +289,15 @@ bool save_blob_to_binary<double>(Blob<double>* blob, const string fn_blob, int n
         buff = blob->mutable_cpu_data() + blob->offset(indices);
 	}
     c = blob->shape(1);
-    if (blob->shape().size() > 2) {
+    // adapt the shape of blob to [N, C, L, W, H] format
+    if (blob->shape().size() > 4) {
         l = blob->shape(2);
         h = blob->shape(3);
         w = blob->shape(4);
+    } else if (blob->shape().size() > 2) {
+        l = 1;
+        h = blob->shape(2);
+        w = blob->shape(3);
     } else {
         l = 1;
         h = 1;
