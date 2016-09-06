@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+
+"""
+Usage: python vis_finetune.py file1 [file2] [file3]
+"""
+
 import numpy as np
 import re
 import click
