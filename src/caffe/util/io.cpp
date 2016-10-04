@@ -249,7 +249,7 @@ bool ReadSegmentRGBToDatum(const string& filename, const int label,
             string filename_t = filename + "/" + tmp;
             cv::Mat cv_img_origin = cv::imread(filename_t, cv_read_flag);
             if (!cv_img_origin.data){
-                LOG(ERROR) << "Could not load file " << filename;
+                LOG(ERROR) << "Could not load file " << filename_t;
                 return false;
             }
             if (height > 0 && width > 0){
