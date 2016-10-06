@@ -4,12 +4,10 @@
  *
  */
 
-
 #ifdef USE_OPENCV
 #include <opencv2/core/core.hpp>
 #endif  // USE_OPENCV
 #include <stdint.h>
-
 #include <vector>
 
 #include "caffe/data_transformer.hpp"

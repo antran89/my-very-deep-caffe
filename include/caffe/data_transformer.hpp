@@ -154,6 +154,17 @@ class DataTransformer {
    */
   void TransformVariedSizeTestDatum(const Datum& datum, Blob<Dtype>* transformed_blob);
 
+  /**
+   * @brief Similar to transformations in TransformVariedSizeDatum, the function is applied to process rgb and
+   * flow data.
+   *
+   * @param datum Input datum.
+   * @param is_flow Wether input datum contains rgb or flow.
+   * @param transformed_blob The tranformed data.
+   */
+  void TransformVariedSizeTwostreamDatum(const Datum& rgb_datum, const Datum& flow_datum,
+                                         Blob<Dtype>* transformed_rgb_blob, Blob<Dtype>* transformed_flow_blob);
+
  protected:
    /**
    * @brief Generates a random integer from Uniform({0, 1, ..., n-1}).
@@ -172,9 +183,11 @@ class DataTransformer {
 
   void TransformVariedSizeTestDatum(const Datum& datum, Dtype* transformed_data);
 
+  void TransformVariedSizeTwostreamDatum(const Datum& rgb_datum, const Datum& flow_datum,
+                                         Dtype* transformed_rgb_data, Dtype* transformed_flow_data);
+
   // Tranformation parameters
   TransformationParameter param_;
-
 
   shared_ptr<Caffe::RNG> rng_;
   Phase phase_;
