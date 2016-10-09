@@ -523,6 +523,9 @@ message FlowDataParameter {
   // Prefetch queue (Number of batches to prefetch to host memory, increase if
   // data access bandwidth varies).
   optional uint32 prefetch = 15 [default = 4];
+
+  // Extract 10 view features when testing.
+  optional bool test_10view_features = 16 [default = false];
 }
 
 // Data layer to read TwostreamData from rgb and flow LMDB database.
@@ -572,6 +575,9 @@ message TwostreamDataParameter {
   // Prefetch queue (Number of batches to prefetch to host memory, increase if
   // data access bandwidth varies).
   optional uint32 prefetch = 15 [default = 4];
+
+  // Extract 10 view features when testing.
+  optional bool test_10view_features = 17 [default = false];
 }
 
 
@@ -599,6 +605,7 @@ message TransformationParameter {
 
   // if set to true,
   // instead using a fixed position cropping (center, left-up, left-down, right-up, right-down)
+  // if set to false, using random cropping in TRAIN phase, and center cropping in TEST phase
   optional bool fix_crop = 10 [default = false];
   // turn on to use stronger augmentation
   optional bool more_fix_crop = 15 [default = false];

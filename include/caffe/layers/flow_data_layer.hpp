@@ -38,6 +38,9 @@ class FlowDataLayer : public BasePrefetchingDataLayer<Dtype> {
   virtual void load_batch(Batch<Dtype>* batch);
 
   FlowDataReader reader_;
+
+  // extract 10-view features
+  int num_test_views_;
 };
 
 }  // namespace caffe

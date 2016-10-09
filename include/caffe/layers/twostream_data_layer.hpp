@@ -42,6 +42,9 @@ class TwostreamDataLayer : public BasePrefetchingTwostreamDataLayer<Dtype> {
   // blob to store transformed data
   Blob<Dtype> transformed_rgb_data_;
   Blob<Dtype> transformed_flow_data_;
+
+  // extract 10-view features
+  int num_test_views_;
 };
 
 }  // namespace caffe
