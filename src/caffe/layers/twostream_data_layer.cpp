@@ -19,7 +19,7 @@ namespace caffe {
 template <typename Dtype>
 TwostreamDataLayer<Dtype>::TwostreamDataLayer(const LayerParameter& param)
     : BasePrefetchingTwostreamDataLayer<Dtype>(param),
-      reader_(param) {
+      reader_(param), num_test_views_(1) {
 }
 
 template <typename Dtype>
@@ -31,14 +31,20 @@ template <typename Dtype>
 void TwostreamDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
                                                const vector<Blob<Dtype>*>& top) {
     const int batch_size = this->layer_param_.twostream_data_param().batch_size();
+    num_test_views_ = this->layer_param_.twostream_data_param().test_10view_features() ? 10 : 1;
+    if (num_test_views_ == 10)
+        CHECK_EQ(this->phase_, TEST) << "Extracting 10-view features is only available in TEST phase";
+    if (this->phase_ == TEST)
+        LOG(INFO) << "Extracting " << num_test_views_ << "-view features in TEST phase.";
 
     // Read a rgb data point, and use it to initialize the first top blob.
     Datum& rgb_datum = *(reader_.rgb_full().peek());
     // Use data_transformer to infer the expected blob shape from datum.
     vector<int> top_shape = this->data_transformer_->InferBlobShape(rgb_datum);
+    top_shape[0] = num_test_views_;
     this->transformed_rgb_data_.Reshape(top_shape);
     // Reshape top[0] and prefetch_data according to the batch_size.
-    top_shape[0] = batch_size;
+    top_shape[0] = batch_size * num_test_views_;
     top[0]->Reshape(top_shape);
     for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
         this->prefetch_[i].rgb_data_.Reshape(top_shape);
@@ -51,9 +57,10 @@ void TwostreamDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& botto
     Datum& flow_datum = *(reader_.flow_full().peek());
     // Use data_transformer to infer the expected blob shape from datum.
     top_shape = this->data_transformer_->InferBlobShape(flow_datum);
+    top_shape[0] = num_test_views_;
     this->transformed_flow_data_.Reshape(top_shape);
     // Reshape top[0] and prefetch_data according to the batch_size.
-    top_shape[0] = batch_size;
+    top_shape[0] = batch_size * num_test_views_;
     top[1]->Reshape(top_shape);
     for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
         this->prefetch_[i].flow_data_.Reshape(top_shape);
@@ -92,18 +99,20 @@ void TwostreamDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     Datum& rgb_datum = *(reader_.rgb_full().peek());
     // Use data_transformer to infer the expected blob shape from datum.
     vector<int> top_shape = this->data_transformer_->InferBlobShape(rgb_datum);
+    top_shape[0] = num_test_views_;
     this->transformed_rgb_data_.Reshape(top_shape);
     // Reshape batch according to the batch_size.
-    top_shape[0] = batch_size;
+    top_shape[0] = batch_size * num_test_views_;
     batch->rgb_data_.Reshape(top_shape);
 
     // flow datum reshape
     Datum& flow_datum = *(reader_.flow_full().peek());
     // Use data_transformer to infer the expected blob shape from datum.
     top_shape = this->data_transformer_->InferBlobShape(flow_datum);
+    top_shape[0] = num_test_views_;
     this->transformed_flow_data_.Reshape(top_shape);
     // Reshape batch according to the batch_size.
-    top_shape[0] = batch_size;
+    top_shape[0] = batch_size * num_test_views_;
     batch->flow_data_.Reshape(top_shape);
 
     Dtype* top_rgb_data = batch->rgb_data_.mutable_cpu_data();
@@ -122,16 +131,22 @@ void TwostreamDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         //    DLOG(INFO) << "number of data in full queue: " << reader_.full().size();
         timer.Start();
         // Apply data transformations (mirror, scale, crop...) to rgb data
-        int offset = batch->rgb_data_.offset(item_id);
+        int offset = batch->rgb_data_.offset(item_id * num_test_views_);
         this->transformed_rgb_data_.set_cpu_data(top_rgb_data + offset);
         // Copy label.
         if (this->output_labels_) {
             top_label[item_id] = rgb_datum.label();
         }
         // Apply data transformations (mirror, scale, crop...) to rgb data
-        offset = batch->flow_data_.offset(item_id);
+        offset = batch->flow_data_.offset(item_id * num_test_views_);
         this->transformed_flow_data_.set_cpu_data(top_flow_data + offset);
-        this->data_transformer_->TransformVariedSizeTwostreamDatum(rgb_datum, flow_datum, &(this->transformed_rgb_data_), &(this->transformed_flow_data_));
+        if (this->phase_ == TRAIN)
+            this->data_transformer_->TransformVariedSizeTwostreamDatum(rgb_datum, flow_datum,
+                                                                       &(this->transformed_rgb_data_), &(this->transformed_flow_data_));
+        else if (this->phase_ == TEST)
+            this->data_transformer_->TransformVariedSizeTwostreamTestDatum(rgb_datum, flow_datum,
+                                                                           &(this->transformed_rgb_data_), &(this->transformed_flow_data_), num_test_views_);
+
         trans_time += timer.MicroSeconds();
 
         // push processed datum back into free queue
