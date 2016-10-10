@@ -147,7 +147,7 @@ void TwostreamDataReader::Body::read_one(db::Cursor* flow_cursor, db::Cursor* rg
     rgb_cursor->Next();
     if (!flow_cursor->valid()) {
         CHECK_EQ(rgb_cursor->valid(), false) << "RGB and flow database must be in the same length";
-        DLOG(INFO) << "Restarting data prefetching from start.";
+        LOG(INFO) << "Restarting data prefetching from start.";
         flow_cursor->SeekToFirst();
         rgb_cursor->SeekToFirst();
     }
