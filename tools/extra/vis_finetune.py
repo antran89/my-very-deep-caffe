@@ -73,7 +73,7 @@ def parse_log(log_file):
 def disp_results(fig, ax1, ax2, loss_iterations, losses, accuracy_iterations, accuracies, accuracies_iteration_checkpoints_ind, color_ind=0):
     modula = len(plt.rcParams['axes.color_cycle'])
     ax1.plot(loss_iterations, losses, color=plt.rcParams['axes.color_cycle'][(color_ind * 2 + 0) % modula])
-    ax2.plot(accuracy_iterations, accuracies, color=plt.rcParams['axes.color_cycle'][(color_ind * 2 + 1) % modula], linestyle='--', marker='o')
+    ax2.plot(accuracy_iterations, accuracies, color=plt.rcParams['axes.color_cycle'][(color_ind * 2 + 0) % modula], linestyle='--', marker='o')
     #ax2.plot(accuracy_iterations[accuracies_iteration_checkpoints_ind], accuracies[accuracies_iteration_checkpoints_ind], 'o', color=plt.rcParams['axes.color_cycle'][(color_ind * 2 + 1) % modula])
 
 if __name__ == '__main__':
