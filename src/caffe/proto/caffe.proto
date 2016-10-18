@@ -306,7 +306,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 148 (last added: twostream_data_param)
+// LayerParameter next available layer-specific ID: 150 (last added: convolution3D_param)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -359,6 +359,7 @@ message LayerParameter {
   optional BiasParameter bias_param = 141;
   optional ConcatParameter concat_param = 104;
   optional ContrastiveLossParameter contrastive_loss_param = 105;
+  optional Convolution3DParameter convolution3D_param = 149;
   optional ConvolutionParameter convolution_param = 106;
   optional DataParameter data_param = 107;
   optional DropoutParameter dropout_param = 108;
@@ -380,6 +381,7 @@ message LayerParameter {
   optional LRNParameter lrn_param = 118;
   optional MemoryDataParameter memory_data_param = 119;
   optional MVNParameter mvn_param = 120;
+  optional Pooling3DParameter pooling3D_param = 148;
   optional PoolingParameter pooling_param = 121;
   optional PowerParameter power_param = 122;
   optional PReLUParameter prelu_param = 131;
@@ -805,6 +807,22 @@ message ConvolutionParameter {
   optional bool force_nd_im2col = 17 [default = false];
 }
 
+// Message that stores parameters used by Convolution3DLayer
+message Convolution3DParameter {
+  optional uint32 num_output = 1; // The number of outputs for the layer
+  optional bool bias_term = 2 [default = true]; // whether to have bias terms
+  optional uint32 pad = 3 [default = 0]; // The padding size
+  optional uint32 kernel_size = 4; // The kernel size
+  optional uint32 group = 5 [default = 1]; // The group size for group conv
+  optional uint32 kernel_depth = 6; // The kernel size
+  optional uint32 stride = 7 [default = 1]; // The stride
+  optional uint32 temporal_stride = 8 [default = 1]; // The stride for temporal
+  optional FillerParameter weight_filler = 9; // The filler for the weight
+  optional FillerParameter bias_filler = 10; // The filler for the bias
+  optional uint32 filter_group = 11 [default = 1]; // divide filters into groups to reduce memory consumption
+  optional uint32 temporal_pad = 12 [default = 0]; // padding size for temporal
+}
+
 message DataParameter {
   enum DB {
     LEVELDB = 0;
@@ -1083,6 +1101,22 @@ message PoolingParameter {
   // If global_pooling then it will pool over the size of the bottom by doing
   // kernel_h = bottom->height and kernel_w = bottom->width
   optional bool global_pooling = 12 [default = false];
+}
+
+// Message that stores parameters used by Pooling3D Layer
+message Pooling3DParameter {
+  enum PoolMethod {
+    MAX = 0;
+    AVE = 1;
+    STOCHASTIC = 2;
+  }
+  optional PoolMethod pool = 1 [default = MAX]; // The pooling method
+  optional uint32 kernel_size = 2; // The kernel size
+  optional uint32 stride = 3 [default = 1]; // The stride
+  // The padding size -- currently implemented only for average pooling.
+  optional uint32 pad = 4 [default = 0];
+  optional uint32 kernel_depth = 5;
+  optional uint32 temporal_stride = 6 [default = 1]; // The stride
 }
 
 message PowerParameter {
