@@ -155,6 +155,12 @@ bool ReadSegmentRGBToDatum(const string& filename, const int label,
 bool ReadSegmentColorFlowToDatum(const string& filename, const int label,
     const vector<int> offsets, const int height, const int width, const int length, Datum* datum, bool is_color);
 
+bool ReadSegmentFlowToTemporalDatum(const string& filename, const int label,
+    const vector<int> offsets, const int height, const int width, const int length, Datum* datum);
+
+bool ReadSegmentRGBToTemporalDatum(const string& filename, const int label,
+    const vector<int> offsets, const int height, const int width, const int length, Datum* datum, bool is_color);
+
 #endif  // USE_OPENCV
 
 }  // namespace caffe
