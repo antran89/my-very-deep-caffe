@@ -184,7 +184,6 @@ void Convolution3DLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 
     if (bias_term_) {
         bias_diff = this->blobs_[1]->mutable_cpu_diff();
-        memset(bias_diff, 0, sizeof(Dtype) * this->blobs_[1]->count());
         for (int n = 0; n < num_; ++n) {
             caffe_cpu_gemv<Dtype>(CblasNoTrans, num_output_, N_,
                                   1., top_diff + top[0]->offset(n),
@@ -196,7 +195,6 @@ void Convolution3DLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     int weight_offset = M_ * K_;
     int top_offset = M_ * N_;
 
-    memset(weight_diff, 0, sizeof(Dtype) * this->blobs_[0]->count());
     for (int n = 0; n < num_; ++n) {
         // since we saved memory in the forward pass by not storing all col data,
         // we will need to recompute them.
