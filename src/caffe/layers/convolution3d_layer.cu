@@ -117,6 +117,7 @@ void Convolution3DLayer<Dtype>::Backward_gpu (const vector<Blob<Dtype>*>& top,
                                   top_diff + top[0]->offset(indices),
                     (Dtype)0., col_diff);
 
+            // accumulate the other filter groups -> col_diff? It is different Caffe group implementation?
             for (int g=1; g<filter_group_; ++g) {
                 caffe_gpu_gemm<Dtype>(CblasTrans, CblasNoTrans, K_, N_, M_,
                                       (Dtype)1., weight + g * weight_offset,
