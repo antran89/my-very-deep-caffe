@@ -81,8 +81,6 @@ void Convolution3DLayer<Dtype>::Backward_gpu (const vector<Blob<Dtype>*>& top,
 
     if (bias_term_) {
         bias_diff = this->blobs_[1]->mutable_gpu_diff();
-        CUDA_CHECK(cudaMemset(bias_diff, 0,
-                              sizeof(Dtype) * this->blobs_[1]->count()));
         // indices for calling offset function of a blob [n,c,l,h,w]
         vector<int> indices(5, 0);
         for (int n = 0; n < num_; ++n) {
@@ -97,8 +95,6 @@ void Convolution3DLayer<Dtype>::Backward_gpu (const vector<Blob<Dtype>*>& top,
     int weight_offset = M_ * K_;
     int top_offset = M_ * N_;
 
-    CUDA_CHECK(cudaMemset(weight_diff, 0,
-                          sizeof(Dtype) * this->blobs_[0]->count()));
     // indices for calling offset function of a blob [n,c,l,h,w]
     vector<int> indices(5, 0);
     for (int n = 0; n < num_; ++n) {
