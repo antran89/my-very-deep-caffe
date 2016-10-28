@@ -115,6 +115,7 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
     vector<pair<int, int> > offset_pairs;
     vector<pair<int, int> > crop_size_pairs;
     cv::Mat multi_scale_bufferM;
+    const int temporal_length = datum_channels / 2;
 
     CHECK_GT(datum_channels, 0);
     CHECK_GE(datum_height, crop_size);
@@ -222,24 +223,24 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
                 }
                 if (need_imgproc){
                     if (has_uint8){
-                        if (param_.is_flow() && do_mirror && c%2 == 0)
+                        if (param_.is_flow() && do_mirror && c >= temporal_length)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                     }else {
-                        if (param_.is_flow() && do_mirror && c%2 == 0)
+                        if (param_.is_flow() && do_mirror && c >= temporal_length)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                     }
                 }else {
                     if (has_uint8) {
-                        if (param_.is_flow() && do_mirror && c%2 == 0)
+                        if (param_.is_flow() && do_mirror && c >= temporal_length)
                             datum_element = 255 - static_cast<Dtype>(static_cast<uint8_t>(data[data_index]));
                         else
                             datum_element = static_cast<Dtype>(static_cast<uint8_t>(data[data_index]));
                     } else {
-                        if (param_.is_flow() && do_mirror && c%2 == 0)
+                        if (param_.is_flow() && do_mirror && c >= temporal_length)
                             datum_element = 255 - datum.float_data(data_index);
                         else
                             datum_element = datum.float_data(data_index);
@@ -250,7 +251,7 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
                         int fixed_data_index = (c * datum_height +  h) * datum_width + w;
                         transformed_data[top_index] =
                                 (datum_element - mean[fixed_data_index]) * scale;
-                    }else{
+                    } else {
                         transformed_data[top_index] =
                                 (datum_element - mean[data_index]) * scale;
                     }
@@ -309,6 +310,7 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
     CHECK_LE(height, datum_height);
     CHECK_LE(width, datum_width);
     CHECK_GE(num, 1);
+    if (param_.is_flow()) CHECK_EQ(datum_channels % 2, 0);
 
     if (crop_size) {
         CHECK_EQ(crop_size, height);
@@ -386,6 +388,7 @@ void DataTransformer<Dtype>::TransformVariedSizeDatum(const Datum& datum,
     const bool do_multi_scale = param_.multi_scale();
     const int new_height = param_.new_height();
     const int new_width = param_.new_width();
+    const int temporal_length = datum_channels/2;
     vector<pair<int, int> > offset_pairs;
     vector<pair<int, int> > crop_size_pairs;
     cv::Mat newM, multi_scale_bufferM;
@@ -393,6 +396,7 @@ void DataTransformer<Dtype>::TransformVariedSizeDatum(const Datum& datum,
     CHECK_GT(datum_channels, 0);
     CHECK_GE(new_height, crop_size);
     CHECK_GE(new_width, crop_size);
+    if (param_.is_flow()) CHECK_EQ(datum_channels % 2, 0);
 
     if (has_mean_values) {
         CHECK(mean_values_.size() == 1 || mean_values_.size() == datum_channels) <<
@@ -494,24 +498,24 @@ void DataTransformer<Dtype>::TransformVariedSizeDatum(const Datum& datum,
                 }
                 if (need_imgproc) {
                     if (has_uint8) {
-                        if (param_.is_flow() && do_mirror && c%2 == 0)
+                        if (param_.is_flow() && do_mirror && c >= temporal_length)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                     }else {
-                        if (param_.is_flow() && do_mirror && c%2 == 0)
+                        if (param_.is_flow() && do_mirror && c >= temporal_length)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                     }
                 } else {
                     if (has_uint8) {
-                        if (param_.is_flow() && do_mirror && c%2 == 0)
+                        if (param_.is_flow() && do_mirror && c >= temporal_length)
                             datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                         else
                             datum_element = static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                     } else {
-                        if (param_.is_flow() && do_mirror && c%2 == 0)
+                        if (param_.is_flow() && do_mirror && c >= temporal_length)
                             datum_element = 255 - static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
                         else
                             datum_element = static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
@@ -597,10 +601,12 @@ void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
     vector<pair<int, int> > crop_size_pairs;
     cv::Mat newM, multi_scale_bufferM;
     bool do_mirror = false;         // do not care about user's mirror setting in TEST phase
+    const int temporal_length = datum_channels / 2;
 
     CHECK_GT(datum_channels, 0);
     CHECK_GE(new_height, crop_size);
     CHECK_GE(new_width, crop_size);
+    if (param_.is_flow()) CHECK_EQ(datum_channels % 2, 0);
 
     if (has_mean_values) {
         CHECK(mean_values_.size() == 1 || mean_values_.size() == datum_channels) <<
@@ -701,24 +707,24 @@ void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
                     }
                     if (need_imgproc) {
                         if (has_uint8) {
-                            if (param_.is_flow() && do_mirror && c%2 == 0)
+                            if (param_.is_flow() && do_mirror && c >= temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                             else
                                 datum_element = static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                         } else {
-                            if (param_.is_flow() && do_mirror && c%2 == 0)
+                            if (param_.is_flow() && do_mirror && c >= temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                             else
                                 datum_element = static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                         }
                     } else {
                         if (has_uint8) {
-                            if (param_.is_flow() && do_mirror && c%2 == 0)
+                            if (param_.is_flow() && do_mirror && c >= temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                             else
                                 datum_element = static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                         } else {
-                            if (param_.is_flow() && do_mirror && c%2 == 0)
+                            if (param_.is_flow() && do_mirror && c >= temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
                             else
                                 datum_element = static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
@@ -762,6 +768,7 @@ void DataTransformer<Dtype>::TransformVariedSizeTwostreamDatum(const Datum& rgb_
     CHECK_EQ(rgb_blob_channels, rgb_datum_channels);
     CHECK_EQ(flow_blob_channels, flow_datum_channels);
     CHECK_GE(num, 1);
+    CHECK_EQ(flow_datum_channels % 2, 0);
 
     if (crop_size) {
         CHECK_EQ(crop_size, rgb_blob_height);
@@ -930,6 +937,7 @@ void DataTransformer<Dtype>::TransformVariedSizeTwostreamDatum(const Datum& rgb_
     datum_channels = flow_datum.channels();
     datum_height = flow_datum.height();
     datum_width = flow_datum.width();
+    const int temporal_length = flow_datum.channels() / 2;
 
     CHECK_GT(datum_channels, 0);
 
@@ -969,24 +977,24 @@ void DataTransformer<Dtype>::TransformVariedSizeTwostreamDatum(const Datum& rgb_
                 }
                 if (need_imgproc) {
                     if (has_uint8) {
-                        if (do_mirror && c%2 == 0)
+                        if (do_mirror && c >= temporal_length)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                     }else {
-                        if (do_mirror && c%2 == 0)
+                        if (do_mirror && c >= temporal_length)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                     }
                 } else {
                     if (has_uint8) {
-                        if (do_mirror && c%2 == 0)
+                        if (do_mirror && c >= temporal_length)
                             datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                         else
                             datum_element = static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                     } else {
-                        if (do_mirror && c%2 == 0)
+                        if (do_mirror && c >= temporal_length)
                             datum_element = 255 - static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
                         else
                             datum_element = static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
@@ -1030,6 +1038,7 @@ void DataTransformer<Dtype>::TransformVariedSizeTwostreamTestDatum(const Datum& 
     CHECK_EQ(rgb_blob_channels, rgb_datum_channels);
     CHECK_EQ(flow_blob_channels, flow_datum_channels);
     CHECK_GE(num, 1);
+    CHECK_EQ(flow_datum_channels % 2, 0);
 
     if (crop_size) {
         CHECK_EQ(crop_size, rgb_blob_height);
@@ -1201,7 +1210,7 @@ void DataTransformer<Dtype>::TransformVariedSizeTwostreamTestDatum(const Datum& 
     datum_channels = flow_datum.channels();
     datum_height = flow_datum.height();
     datum_width = flow_datum.width();
-
+    const int temporal_length = flow_datum.channels() / 2;
     CHECK_GT(datum_channels, 0);
 
     // flow processing
@@ -1277,24 +1286,24 @@ void DataTransformer<Dtype>::TransformVariedSizeTwostreamTestDatum(const Datum& 
                     }
                     if (need_imgproc) {
                         if (has_uint8) {
-                            if (do_mirror && c%2 == 0)
+                            if (do_mirror && c >= temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                             else
                                 datum_element = static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                         }else {
-                            if (do_mirror && c%2 == 0)
+                            if (do_mirror && c >= temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                             else
                                 datum_element = static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                         }
                     } else {
                         if (has_uint8) {
-                            if (do_mirror && c%2 == 0)
+                            if (do_mirror && c >= temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                             else
                                 datum_element = static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                         } else {
-                            if (do_mirror && c%2 == 0)
+                            if (do_mirror && c >= temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
                             else
                                 datum_element = static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
