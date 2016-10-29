@@ -223,24 +223,24 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
                 }
                 if (need_imgproc){
                     if (has_uint8){
-                        if (param_.is_flow() && do_mirror && c >= temporal_length)
+                        if (param_.is_flow() && do_mirror && c < temporal_length)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                     }else {
-                        if (param_.is_flow() && do_mirror && c >= temporal_length)
+                        if (param_.is_flow() && do_mirror && c < temporal_length)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                     }
                 }else {
                     if (has_uint8) {
-                        if (param_.is_flow() && do_mirror && c >= temporal_length)
+                        if (param_.is_flow() && do_mirror && c < temporal_length)
                             datum_element = 255 - static_cast<Dtype>(static_cast<uint8_t>(data[data_index]));
                         else
                             datum_element = static_cast<Dtype>(static_cast<uint8_t>(data[data_index]));
                     } else {
-                        if (param_.is_flow() && do_mirror && c >= temporal_length)
+                        if (param_.is_flow() && do_mirror && c < temporal_length)
                             datum_element = 255 - datum.float_data(data_index);
                         else
                             datum_element = datum.float_data(data_index);
@@ -498,24 +498,24 @@ void DataTransformer<Dtype>::TransformVariedSizeDatum(const Datum& datum,
                 }
                 if (need_imgproc) {
                     if (has_uint8) {
-                        if (param_.is_flow() && do_mirror && c >= temporal_length)
+                        if (param_.is_flow() && do_mirror && c < temporal_length)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                     }else {
-                        if (param_.is_flow() && do_mirror && c >= temporal_length)
+                        if (param_.is_flow() && do_mirror && c < temporal_length)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                     }
                 } else {
                     if (has_uint8) {
-                        if (param_.is_flow() && do_mirror && c >= temporal_length)
+                        if (param_.is_flow() && do_mirror && c < temporal_length)
                             datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                         else
                             datum_element = static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                     } else {
-                        if (param_.is_flow() && do_mirror && c >= temporal_length)
+                        if (param_.is_flow() && do_mirror && c < temporal_length)
                             datum_element = 255 - static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
                         else
                             datum_element = static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
@@ -707,24 +707,24 @@ void DataTransformer<Dtype>::TransformVariedSizeTestDatum(const Datum& datum,
                     }
                     if (need_imgproc) {
                         if (has_uint8) {
-                            if (param_.is_flow() && do_mirror && c >= temporal_length)
+                            if (param_.is_flow() && do_mirror && c < temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                             else
                                 datum_element = static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                         } else {
-                            if (param_.is_flow() && do_mirror && c >= temporal_length)
+                            if (param_.is_flow() && do_mirror && c < temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                             else
                                 datum_element = static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                         }
                     } else {
                         if (has_uint8) {
-                            if (param_.is_flow() && do_mirror && c >= temporal_length)
+                            if (param_.is_flow() && do_mirror && c < temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                             else
                                 datum_element = static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                         } else {
-                            if (param_.is_flow() && do_mirror && c >= temporal_length)
+                            if (param_.is_flow() && do_mirror && c < temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
                             else
                                 datum_element = static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
@@ -977,24 +977,24 @@ void DataTransformer<Dtype>::TransformVariedSizeTwostreamDatum(const Datum& rgb_
                 }
                 if (need_imgproc) {
                     if (has_uint8) {
-                        if (do_mirror && c >= temporal_length)
+                        if (do_mirror && c < temporal_length)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                     }else {
-                        if (do_mirror && c >= temporal_length)
+                        if (do_mirror && c < temporal_length)
                             datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                         else
                             datum_element = static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                     }
                 } else {
                     if (has_uint8) {
-                        if (do_mirror && c >= temporal_length)
+                        if (do_mirror && c < temporal_length)
                             datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                         else
                             datum_element = static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                     } else {
-                        if (do_mirror && c >= temporal_length)
+                        if (do_mirror && c < temporal_length)
                             datum_element = 255 - static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
                         else
                             datum_element = static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
@@ -1286,24 +1286,24 @@ void DataTransformer<Dtype>::TransformVariedSizeTwostreamTestDatum(const Datum& 
                     }
                     if (need_imgproc) {
                         if (has_uint8) {
-                            if (do_mirror && c >= temporal_length)
+                            if (do_mirror && c < temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                             else
                                 datum_element = static_cast<Dtype>(multi_scale_bufferM.at<uint8_t>(h, w));
                         }else {
-                            if (do_mirror && c >= temporal_length)
+                            if (do_mirror && c < temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                             else
                                 datum_element = static_cast<Dtype>(multi_scale_bufferM.at<float>(h, w));
                         }
                     } else {
                         if (has_uint8) {
-                            if (do_mirror && c >= temporal_length)
+                            if (do_mirror && c < temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                             else
                                 datum_element = static_cast<Dtype>(newM.at<uint8_t>(h + h_off, w + w_off));
                         } else {
-                            if (do_mirror && c >= temporal_length)
+                            if (do_mirror && c < temporal_length)
                                 datum_element = 255 - static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
                             else
                                 datum_element = static_cast<Dtype>(newM.at<float>(h + h_off, w + w_off));
