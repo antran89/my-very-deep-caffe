@@ -90,7 +90,7 @@ void Convolution3DLayer<Dtype>::Reshape(const vector<Blob<Dtype> *> &bottom, con
 
     // Check if we need to set up the weights
     if (this->blobs_.size() > 0) {
-//        LOG(INFO) << "Skipping parameter initialization";
+        LOG(INFO) << "Skipping parameter initialization";
     } else {
         if (bias_term_) {
             this->blobs_.resize(2);
@@ -110,18 +110,12 @@ void Convolution3DLayer<Dtype>::Reshape(const vector<Blob<Dtype> *> &bottom, con
         weight_filler->Fill(this->blobs_[0].get());
         // If necessary, initialize and fill the bias term
         if (bias_term_) {
-            shape[0] = 1;
-            shape[1] = 1;
-            shape[2] = 1;
-            shape[3] = 1;
-            shape[4] = num_output_;
-            this->blobs_[1].reset(new Blob<Dtype>(shape));
+            vector<int> bias_shape(1, num_output_);
+            this->blobs_[1].reset(new Blob<Dtype>(bias_shape));
             shared_ptr<Filler<Dtype> > bias_filler(GetFiller<Dtype>(
                                                        this->layer_param_.convolution3d_param().bias_filler()));
             bias_filler->Fill(this->blobs_[1].get());
         }
-
-
     }
 
     // Set up the bias filler
@@ -133,7 +127,6 @@ void Convolution3DLayer<Dtype>::Reshape(const vector<Blob<Dtype> *> &bottom, con
             bias_multiplier_data[i] = 1.;
         }
     }
-
 }
 
 template <typename Dtype>
