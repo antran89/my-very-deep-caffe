@@ -334,7 +334,6 @@ bool ReadSegmentRGBToTemporalDatum(const string& filename, const int label,
                 datum->set_label(label);
                 datum->clear_data();
                 datum->clear_float_data();
-                datum_string = datum->mutable_data();
                 image_size = cv_img.rows * cv_img.cols;
                 channel_size = length * offsets.size() * image_size;
                 data_size = num_channels * image_size;
