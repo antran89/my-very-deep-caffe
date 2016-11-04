@@ -293,11 +293,11 @@ void ImageChannelToBuffer(const cv::Mat* img, char* buffer, const int c, const b
     if (is_color) {
         for (int h = 0; h < img->rows; ++h)
             for (int w = 0; w < img->cols; ++w)
-                buffer[idx++] = img->at<cv::Vec3b>(h, w)[c];
+                buffer[idx++] = static_cast<char>(img->at<cv::Vec3b>(h, w)[c]);
     } else { // Faster than repeatedly testing is_color for each pixel w/i loop
         for (int h = 0; h < img->rows; ++h)
             for (int w = 0; w < img->cols; ++w)
-                buffer[idx++] = img->at<uchar>(h, w);
+                buffer[idx++] = static_cast<char>(img->at<uchar>(h, w));
     }
 }
 
@@ -306,7 +306,7 @@ bool ReadSegmentRGBToTemporalDatum(const string& filename, const int label,
     cv::Mat cv_img;
     char tmp[30];
     char *buffer;
-    int mem_offset, channel_size, image_size, data_size;
+    unsigned long int mem_offset, channel_size, image_size, data_size;
     int cv_read_flag = is_color ? CV_LOAD_IMAGE_COLOR : CV_LOAD_IMAGE_GRAYSCALE;
     int num_channels = (is_color ? 3 : 1);
 
@@ -336,7 +336,7 @@ bool ReadSegmentRGBToTemporalDatum(const string& filename, const int label,
                 datum->clear_float_data();
                 image_size = cv_img.rows * cv_img.cols;
                 channel_size = length * offsets.size() * image_size;
-                data_size = num_channels * image_size;
+                data_size = num_channels * channel_size;
                 buffer = new char[data_size];
             }
 
