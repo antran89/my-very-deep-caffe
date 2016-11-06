@@ -1072,6 +1072,10 @@ message MVNParameter {
 
   // Epsilon for not dividing by zero while normalizing variance
   optional float eps = 3 [default = 1e-9];
+
+  // The index of the axis for performing mean-variance normalization from
+  // that axis into the end.
+  optional int32 axis = 4 [default = 2];
 }
 
 message PoolingParameter {
