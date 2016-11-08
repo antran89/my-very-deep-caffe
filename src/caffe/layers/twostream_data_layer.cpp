@@ -81,7 +81,7 @@ void TwostreamDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& botto
 
 // This function is called on prefetch thread
 template<typename Dtype>
-void TwostreamDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
+void TwostreamDataLayer<Dtype>::load_batch(TwostreamBatch<Dtype>* batch) {
     CPUTimer batch_timer;
     batch_timer.Start();
     double read_time = 0;

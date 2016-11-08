@@ -1,5 +1,5 @@
-#ifndef CAFFE_DATA_LAYERS_HPP_
-#define CAFFE_DATA_LAYERS_HPP_
+#ifndef CAFFE_TWOSTREAM_DATA_LAYERS_HPP_
+#define CAFFE_TWOSTREAM_DATA_LAYERS_HPP_
 
 #include <vector>
 
@@ -48,7 +48,7 @@ protected:
 };
 
 template <typename Dtype>
-class Batch {
+class TwostreamBatch {
 public:
     Blob<Dtype> flow_data_, rgb_data_, label_;
 };
@@ -74,14 +74,14 @@ public:
 
 protected:
     virtual void InternalThreadEntry();
-    virtual void load_batch(Batch<Dtype>* batch) = 0;
+    virtual void load_batch(TwostreamBatch<Dtype>* batch) = 0;
 
-    Batch<Dtype> prefetch_[PREFETCH_COUNT];
-    BlockingQueue<Batch<Dtype>*> prefetch_free_;
-    BlockingQueue<Batch<Dtype>*> prefetch_full_;
+    TwostreamBatch<Dtype> prefetch_[PREFETCH_COUNT];
+    BlockingQueue<TwostreamBatch<Dtype>*> prefetch_free_;
+    BlockingQueue<TwostreamBatch<Dtype>*> prefetch_full_;
 
 };
 
 }  // namespace caffe
 
-#endif  // CAFFE_DATA_LAYERS_HPP_
+#endif  // CAFFE_TWOSTREAM_DATA_LAYERS_HPP_

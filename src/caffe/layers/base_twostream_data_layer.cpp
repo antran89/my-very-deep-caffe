@@ -85,7 +85,7 @@ void BasePrefetchingTwostreamDataLayer<Dtype>::InternalThreadEntry() {
 
     try {
         while (!must_stop()) {
-            Batch<Dtype>* batch = prefetch_free_.pop("Waiting for free prefetch batch");
+            TwostreamBatch<Dtype>* batch = prefetch_free_.pop("Waiting for free prefetch batch");
             load_batch(batch);
 #ifndef CPU_ONLY
             if (Caffe::mode() == Caffe::GPU) {
@@ -109,7 +109,7 @@ void BasePrefetchingTwostreamDataLayer<Dtype>::InternalThreadEntry() {
 template <typename Dtype>
 void BasePrefetchingTwostreamDataLayer<Dtype>::Forward_cpu(
         const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-    Batch<Dtype>* batch = prefetch_full_.pop("Data layer prefetch queue empty");
+    TwostreamBatch<Dtype>* batch = prefetch_full_.pop("Data layer prefetch queue empty");
     // Reshape to loaded data.
     top[0]->ReshapeLike(batch->rgb_data_);
     top[1]->ReshapeLike(batch->flow_data_);
