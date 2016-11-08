@@ -7,7 +7,7 @@ namespace caffe {
 template <typename Dtype>
 void BasePrefetchingTwostreamDataLayer<Dtype>::Forward_gpu(
         const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-    Batch<Dtype>* batch = prefetch_full_.pop("Data layer prefetch queue empty");
+    TwostreamBatch<Dtype>* batch = prefetch_full_.pop("Data layer prefetch queue empty");
     // Reshape to loaded data.
     top[0]->ReshapeLike(batch->rgb_data_);
     top[1]->ReshapeLike(batch->flow_data_);

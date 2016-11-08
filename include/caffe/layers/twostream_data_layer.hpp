@@ -35,7 +35,7 @@ class TwostreamDataLayer : public BasePrefetchingTwostreamDataLayer<Dtype> {
   virtual inline int MaxTopBlobs() const { return 3; }
 
  protected:
-  virtual void load_batch(Batch<Dtype>* batch);
+  virtual void load_batch(TwostreamBatch<Dtype>* batch);
 
   TwostreamDataReader reader_;
 
