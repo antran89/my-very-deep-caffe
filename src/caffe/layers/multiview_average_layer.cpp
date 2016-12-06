@@ -62,7 +62,7 @@ void MultiviewAverageLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
 }
 
 #ifdef CPU_ONLY
-STUB_GPU(PoolingLayer);
+STUB_GPU(MultiviewAverageLayer);
 #endif
 
 INSTANTIATE_CLASS(MultiviewAverageLayer);
