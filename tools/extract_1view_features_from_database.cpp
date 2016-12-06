@@ -15,7 +15,6 @@
  */
 
 #include <stdio.h>  // for snprintf
-#include <cuda_runtime.h>
 #include <google/protobuf/text_format.h>
 #include <string>
 #include <vector>
