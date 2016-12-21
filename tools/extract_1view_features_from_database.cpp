@@ -90,7 +90,7 @@ int feature_extraction_pipeline(int argc, char** argv) {
         for (int k=7; k<argc; k++){
             const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net
                     ->blob_by_name(string(argv[k]));
-            int num_features = feature_blob->num();
+            int num_features = feature_blob->shape(0);
             CHECK_EQ(num_features, batch_size) << "Number of features in a batch must be equal to batch size";
 
             for (int n = 0; n < num_features; ++n) {
