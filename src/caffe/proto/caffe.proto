@@ -409,6 +409,7 @@ message LayerParameter {
   optional WindowDataParameter window_data_param = 129;
   optional VideoDataParameter video_data_param = 144;
   optional VideoSegmentDataParameter video_segment_data_param = 146;
+  optional VideoSnippetDataParameter video_snippet_data_param = 150;
 }
 
 // Video Data Layer mainly from Wang Limin's tools
@@ -538,6 +539,57 @@ message FlowDataParameter {
   optional bool test_10view_features = 16 [default = false];
 }
 
+// data layer to read video snippets from hard disks
+message VideoSnippetDataParameter {
+  enum DB {
+      LEVELDB = 0;
+      LMDB = 1;
+  }
+
+  // Specify the data source.
+  optional string source = 1;
+  // Specify the batch size.
+  optional uint32 batch_size = 4;
+  // The rand_skip variable is for the data layer to skip a few data points
+  // to avoid all asynchronous sgd clients to start at the same point. The skip
+  // point would be set as rand_skip * rand(0,1). Note that rand_skip should not
+  // be larger than the number of keys in the leveldb.
+  optional uint32 rand_skip = 7 [default = 0];
+  // Whether or not ImageLayer should shuffle the list of files at every epoch.
+  optional bool shuffle = 8 [default = false];
+  // It will also resize images if new_height or new_width are not zero.
+  optional uint32 new_height = 9 [default = 0];
+  optional uint32 new_width = 10 [default = 0];
+  optional uint32 new_length = 11 [default = 1];
+  optional uint32 num_segments = 12 [default = 1];
+  // DEPRECATED. See TransformationParameter. For data pre-processing, we can do
+  // simple scaling and subtracting the data mean, if provided. Note that the
+  // mean subtraction is always carried out before scaling.
+  optional float scale = 2 [default = 1];
+  optional string mean_file = 3;
+  // DEPRECATED. See TransformationParameter. Specify if we would like to randomly
+  // crop an image.
+  optional uint32 crop_size = 5 [default = 0];
+  // DEPRECATED. See TransformationParameter. Specify if we want to randomly mirror
+  // data.
+  optional bool mirror = 6 [default = false];
+  enum Modality {
+    RGB = 0;
+    FLOW = 1;
+    FOREGROUND_SALIENCY = 2;
+  }
+  optional Modality modality = 13 [default = FLOW];
+  optional DB backend = 14 [default = LEVELDB];
+  // Prefetch queue (Number of batches to prefetch to host memory, increase if
+  // data access bandwidth varies).
+  optional uint32 prefetch = 15 [default = 4];
+
+  // Extract 10 view features when testing.
+  optional bool test_10view_features = 16 [default = false];
+  // Preserve the temporal order in channels from L frames [N, C, L, H, W]
+  optional bool preserve_temporal = 17 [default = true];
+}
+
 // Data layer to read TwostreamData from rgb and flow LMDB database.
 // The video is segmented and converted into rgb and flow LMDB format.
 // The segments in rgb and flow LMDB are matching each other.
@@ -588,6 +640,8 @@ message TwostreamDataParameter {
 
   // Extract 10 view features when testing.
   optional bool test_10view_features = 17 [default = false];
+  // Preserve the temporal order in channels from L frames [N, C, L, H, W]
+  optional bool preserve_temporal = 18 [default = true];
 }
 
 

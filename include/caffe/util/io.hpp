@@ -150,16 +150,16 @@ bool ReadSegmentFlowToDatum(const string& filename, const int label,
     const vector<int> offsets, const int height, const int width, const int length, Datum* datum);
 
 bool ReadSegmentRGBToDatum(const string& filename, const int label,
-    const vector<int> offsets, const int height, const int width, const int length, Datum* datum, bool is_color);
+    const vector<int> offsets, const int height, const int width, const int length, Datum* datum, bool is_color = true);
 
 bool ReadSegmentColorFlowToDatum(const string& filename, const int label,
-    const vector<int> offsets, const int height, const int width, const int length, Datum* datum, bool is_color);
+    const vector<int> offsets, const int height, const int width, const int length, Datum* datum, bool is_color = true);
 
 bool ReadSegmentFlowToTemporalDatum(const string& filename, const int label,
     const vector<int> offsets, const int height, const int width, const int length, Datum* datum);
 
 bool ReadSegmentRGBToTemporalDatum(const string& filename, const int label,
-    const vector<int> offsets, const int height, const int width, const int length, Datum* datum, bool is_color);
+    const vector<int> offsets, const int height, const int width, const int length, Datum* datum, bool is_color = true);
 
 #endif  // USE_OPENCV
 
