@@ -53,7 +53,7 @@ class VideoSnippetDataReader {
    protected:
     void InternalThreadEntry();
     void read_one(std::ifstream& infile, const bool preserve_temporal, const bool is_flow,
-                  const bool new_length, QueuePair* qp);
+                  const int new_length, QueuePair* qp);
 
     const LayerParameter param_;
     BlockingQueue<shared_ptr<QueuePair> > new_queue_pairs_;

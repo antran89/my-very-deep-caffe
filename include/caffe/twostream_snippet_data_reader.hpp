@@ -68,7 +68,7 @@ protected:
     protected:
         void InternalThreadEntry();
         void read_one(std::ifstream& inflow_file, std::ifstream& inrgb_file, const bool preserve_temporal,
-                      const bool new_length, QueuePair* qp);
+                      const int new_length, QueuePair* qp);
 
         const LayerParameter param_;
         BlockingQueue<shared_ptr<QueuePair> > new_queue_pairs_;

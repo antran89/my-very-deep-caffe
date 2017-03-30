@@ -121,7 +121,7 @@ void TwostreamSnippetDataReader::Body::InternalThreadEntry() {
 }
 
 void TwostreamSnippetDataReader::Body::read_one(std::ifstream& inflow_file, std::ifstream& inrgb_file, const bool preserve_temporal,
-                                                const bool new_length, QueuePair* qp) {
+                                                const int new_length, QueuePair* qp) {
     // reading flow and rgb datum
     Datum* flow_datum = qp->flow_free_.pop();
     Datum* rgb_datum = qp->rgb_free_.pop();
@@ -166,7 +166,6 @@ void TwostreamSnippetDataReader::Body::read_one(std::ifstream& inflow_file, std:
         inrgb_file.clear();
         inrgb_file.seekg(0, ios::beg);
     }
-
 }
 
 }  // namespace caffe
