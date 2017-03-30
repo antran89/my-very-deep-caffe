@@ -94,7 +94,7 @@ void VideoSnippetDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   for (int item_id = 0; item_id < batch_size; ++item_id) {
     timer.Start();
     // get a datum
-    Datum& datum = *(reader_.full().pop("Waiting for flow data"));
+    Datum& datum = *(reader_.full().pop("Waiting for snippet data"));
     read_time += timer.MicroSeconds();
 //    DLOG(INFO) << "number of data in full queue: " << reader_.full().size();
     timer.Start();

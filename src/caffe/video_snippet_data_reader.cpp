@@ -106,7 +106,7 @@ void VideoSnippetDataReader::Body::InternalThreadEntry() {
 }
 
 void VideoSnippetDataReader::Body::read_one(std::ifstream& infile, const bool preserve_temporal, const bool is_flow,
-                                            const bool new_length, QueuePair* qp) {
+                                            const int new_length, QueuePair* qp) {
   Datum* datum = qp->free_.pop();
   // reading a video snippet into datum
   string file_name;
