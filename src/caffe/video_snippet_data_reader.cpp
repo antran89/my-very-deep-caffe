@@ -133,12 +133,12 @@ void VideoSnippetDataReader::Body::read_one(std::ifstream& infile, const bool pr
   }
   else {
       qp->free_.push(datum);
-      LOG(INFO) << "Failed to read one datum.";
+      DLOG(INFO) << "Failed to read one datum.";
   }
 
   // check if end of file, then rewind
   if (infile.peek() == EOF) {
-      DLOG(INFO) << "Restarting data prefetching from start.";
+      LOG(INFO) << "Restarting data prefetching from start.";
       infile.clear();
       infile.seekg(0, ios::beg);
   }
