@@ -306,7 +306,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 147 (last added: recurrent_param)
+// LayerParameter next available layer-specific ID: 154 (last added: video_snippet_data_param)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -375,7 +375,7 @@ message LayerParameter {
   optional EmbedParameter embed_param = 137;
   optional ExpParameter exp_param = 111;
   optional FlattenParameter flatten_param = 135;
-  optional FlowDataParameter flow_data_param = 145;
+  optional FlowDataParameter flow_data_param = 151;
   optional HDF5DataParameter hdf5_data_param = 112;
   optional HDF5OutputParameter hdf5_output_param = 113;
   optional HingeLossParameter hinge_loss_param = 114;
@@ -388,7 +388,7 @@ message LayerParameter {
   optional MemoryDataParameter memory_data_param = 119;
   optional MVNParameter mvn_param = 120;
   optional ParameterParameter parameter_param = 145;
-  optional Pooling3DParameter pooling3D_param = 148;
+  optional Pooling3DParameter pooling3d_param = 148;
   optional PoolingParameter pooling_param = 121;
   optional PowerParameter power_param = 122;
   optional PReLUParameter prelu_param = 131;
@@ -407,9 +407,9 @@ message LayerParameter {
   optional TileParameter tile_param = 138;
   optional TwostreamDataParameter twostream_data_param = 147;
   optional WindowDataParameter window_data_param = 129;
-  optional VideoDataParameter video_data_param = 144;
-  optional VideoSegmentDataParameter video_segment_data_param = 146;
-  optional VideoSnippetDataParameter video_snippet_data_param = 150;
+  optional VideoDataParameter video_data_param = 152;
+  optional VideoSegmentDataParameter video_segment_data_param = 150;
+  optional VideoSnippetDataParameter video_snippet_data_param = 153;
 }
 
 // Video Data Layer mainly from Wang Limin's tools
