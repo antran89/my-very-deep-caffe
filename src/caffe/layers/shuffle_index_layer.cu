@@ -49,12 +49,13 @@ void ShuffleIndexLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype> *> &bottom,
 
     // allocate memory for bottom_shape and top_shape on global GPU memory
     int *d_bottom_shape, *d_top_shape, *d_new_axes;
-    cudaMalloc(&d_bottom_shape, num_axes);
-    cudaMemcpy(d_bottom_shape, &bottom_shape[0], num_axes, cudaMemcpyHostToDevice);
-    cudaMalloc(&d_top_shape, num_axes);
-    cudaMemcpy(d_top_shape, &top_shape[0], num_axes, cudaMemcpyHostToDevice);
-    cudaMalloc(&d_new_axes, num_axes);
-    cudaMemcpy(d_new_axes, &new_axes_[0], num_axes, cudaMemcpyHostToDevice);
+    int size = num_axes * sizeof(int);
+    cudaMalloc(&d_bottom_shape, size);
+    cudaMemcpy(d_bottom_shape, &bottom_shape[0], size, cudaMemcpyHostToDevice);
+    cudaMalloc(&d_top_shape, size);
+    cudaMemcpy(d_top_shape, &top_shape[0], size, cudaMemcpyHostToDevice);
+    cudaMalloc(&d_new_axes, size);
+    cudaMemcpy(d_new_axes, &new_axes_[0], size, cudaMemcpyHostToDevice);
 
     ShuffleIndexForward<Dtype> <<<CAFFE_GET_BLOCKS(bottom_count), CAFFE_CUDA_NUM_THREADS>>>(
     num_axes, d_bottom_shape, d_top_shape, d_new_axes, bottom_count, bottom_data, top_data);
@@ -109,12 +110,13 @@ void ShuffleIndexLayer<Dtype>::Backward_gpu(
 
     // allocate memory for bottom_shape and top_shape on global GPU memory
     int *d_bottom_shape, *d_top_shape, *d_new_axes;
-    cudaMalloc(&d_bottom_shape, num_axes);
-    cudaMemcpy(d_bottom_shape, &bottom_shape[0], num_axes, cudaMemcpyHostToDevice);
-    cudaMalloc(&d_top_shape, num_axes);
-    cudaMemcpy(d_top_shape, &top_shape[0], num_axes, cudaMemcpyHostToDevice);
-    cudaMalloc(&d_new_axes, num_axes);
-    cudaMemcpy(d_new_axes, &new_axes_[0], num_axes, cudaMemcpyHostToDevice);
+    int size = num_axes * sizeof(int);
+    cudaMalloc(&d_bottom_shape, size);
+    cudaMemcpy(d_bottom_shape, &bottom_shape[0], size, cudaMemcpyHostToDevice);
+    cudaMalloc(&d_top_shape, size);
+    cudaMemcpy(d_top_shape, &top_shape[0], size, cudaMemcpyHostToDevice);
+    cudaMalloc(&d_new_axes, size);
+    cudaMemcpy(d_new_axes, &new_axes_[0], size, cudaMemcpyHostToDevice);
 
     ShuffleIndexBackward<Dtype> <<<CAFFE_GET_BLOCKS(bottom_count), CAFFE_CUDA_NUM_THREADS>>>(
     num_axes, d_bottom_shape, d_top_shape, d_new_axes, bottom_count, top_diff, bottom_diff);
