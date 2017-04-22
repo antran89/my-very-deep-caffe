@@ -22,9 +22,9 @@ __global__ void ShuffleIndexForward(const int num_axes, const int* d_bottom_shap
             bot_axis = d_new_axes[i];
             index_cnt = index;
             for (int k = num_axes-1; k > bot_axis; k--) {
-                index_cnt /= d_bottom_shape[i];
+                index_cnt /= d_bottom_shape[k];
             }
-            top_index = index_cnt % d_bottom_shape[i];
+            top_index = index_cnt % d_bottom_shape[bot_axis];
 
             // accumulate top_offset
             top_offset *= d_top_shape[i];
@@ -79,9 +79,9 @@ __global__ void ShuffleIndexBackward(const int num_axes, const int* d_bottom_sha
             bot_axis = d_new_axes[i];
             index_cnt = index;
             for (int k = num_axes-1; k > bot_axis; k--) {
-                index_cnt /= d_bottom_shape[i];
+                index_cnt /= d_bottom_shape[k];
             }
-            top_index = index_cnt % d_bottom_shape[i];
+            top_index = index_cnt % d_bottom_shape[bot_axis];
 
             // accumulate top_offset
             top_offset *= d_top_shape[i];
