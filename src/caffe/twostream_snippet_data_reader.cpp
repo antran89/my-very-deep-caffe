@@ -159,6 +159,7 @@ void TwostreamSnippetDataReader::Body::read_one(std::ifstream& inflow_file, std:
 
     // check if end of file, then rewind
     if (inflow_file.peek() == EOF) {
+        inrgb_file >> file_name >> start_fr >> label;   // move inrgb_file peek into the end
         CHECK_EQ(inrgb_file.peek(), EOF) << "RGB and flow database must be in the same length";
         DLOG(INFO) << "Restarting data prefetching from start.";
         inflow_file.clear();
