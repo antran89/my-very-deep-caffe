@@ -411,9 +411,9 @@ bool ReadSegmentFlowToTemporalDatum(const string& filename, const int label,
     char tmp[30];
     int num_channels = 2;       // 2 channels: flow_x and flow_y
 
-    // saving flow_x components
     for (int i = 0; i < offsets.size(); ++i) {
         int offset = offsets[i];
+        // saving flow_x components
         for (int file_id = 1; file_id < length+1; ++file_id) {
             sprintf(tmp,"flow_x_%04d.jpg",int(file_id+offset));
             string filename_x = filename + "/" + tmp;
@@ -442,11 +442,7 @@ bool ReadSegmentFlowToTemporalDatum(const string& filename, const int label,
                 }
             }
         }
-    }
-
-    // saving flow_y components
-    for (int i = 0; i < offsets.size(); ++i) {
-        int offset = offsets[i];
+        // saving flow_y components
         for (int file_id = 1; file_id < length+1; ++file_id) {
             sprintf(tmp,"flow_y_%04d.jpg",int(file_id+offset));
             string filename_y = filename + "/" + tmp;
@@ -466,7 +462,6 @@ bool ReadSegmentFlowToTemporalDatum(const string& filename, const int label,
             }
         }
     }
-
     return true;
 }
 
