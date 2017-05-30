@@ -247,13 +247,13 @@ bool ReadSegmentRGBToDatum(const string& filename, const int label,
             sprintf(tmp,"im_%04d.jpg",int(file_id+offset));
             string filename_t = filename + "/" + tmp;
             cv::Mat cv_img_origin = cv::imread(filename_t, cv_read_flag);
-            if (!cv_img_origin.data) {
+            if (!cv_img_origin.data){
                 LOG(ERROR) << "Could not load file " << filename_t;
                 return false;
             }
-            if (height > 0 && width > 0) {
+            if (height > 0 && width > 0){
                 cv::resize(cv_img_origin, cv_img, cv::Size(width, height));
-            } else {
+            }else{
                 cv_img = cv_img_origin;
             }
             int num_channels = (is_color ? 3 : 1);
@@ -310,8 +310,6 @@ bool ReadSegmentRGBToTemporalDatum(const string& filename, const int label,
     int cv_read_flag = is_color ? CV_LOAD_IMAGE_COLOR : CV_LOAD_IMAGE_GRAYSCALE;
     int num_channels = (is_color ? 3 : 1);
 
-    // fill the last image if not enough frames in a video
-    cv::Mat cv_last_img_;
     mem_offset = 0;
     for (int i = 0; i < offsets.size(); ++i) {
         int offset = offsets[i];
@@ -319,13 +317,13 @@ bool ReadSegmentRGBToTemporalDatum(const string& filename, const int label,
             sprintf(tmp, "im_%04d.jpg", int(file_id + offset));
             string filename_t = filename + "/" + tmp;
             cv::Mat cv_img_origin = cv::imread(filename_t, cv_read_flag);
-            if (!cv_img_origin.data)    // backup last read frame
-                cv_img_origin = cv_last_img_;
-            else
-                cv_last_img_ = cv_img_origin;
-            if (height > 0 && width > 0) {
+            if (!cv_img_origin.data) {
+                LOG(ERROR) << "Could not load file " << filename_t;
+                return false;
+            }
+            if (height > 0 && width > 0){
                 cv::resize(cv_img_origin, cv_img, cv::Size(width, height));
-            } else {
+            }else{
                 cv_img = cv_img_origin;
             }
 
@@ -413,20 +411,17 @@ bool ReadSegmentFlowToTemporalDatum(const string& filename, const int label,
     char tmp[30];
     int num_channels = 2;       // 2 channels: flow_x and flow_y
 
-    // fill the last image if not enough frames in a video
-    cv::Mat cv_last_flow_;
-
-    // saving flow_x components
     for (int i = 0; i < offsets.size(); ++i) {
         int offset = offsets[i];
+        // saving flow_x components
         for (int file_id = 1; file_id < length+1; ++file_id) {
             sprintf(tmp,"flow_x_%04d.jpg",int(file_id+offset));
             string filename_x = filename + "/" + tmp;
             cv::Mat cv_img_origin_x = cv::imread(filename_x, CV_LOAD_IMAGE_GRAYSCALE);
-            if (!cv_img_origin_x.data)
-                cv_img_origin_x = cv_last_flow_;
-            else
-                cv_last_flow_ = cv_img_origin_x;
+            if (!cv_img_origin_x.data) {
+                LOG(ERROR) << "Could not load file " << filename_x;
+                return false;
+            }
             if (height > 0 && width > 0)
                 cv::resize(cv_img_origin_x, cv_img_x, cv::Size(width, height));
             else
@@ -447,19 +442,15 @@ bool ReadSegmentFlowToTemporalDatum(const string& filename, const int label,
                 }
             }
         }
-    }
-
-    // saving flow_y components
-    for (int i = 0; i < offsets.size(); ++i) {
-        int offset = offsets[i];
+        // saving flow_y components
         for (int file_id = 1; file_id < length+1; ++file_id) {
             sprintf(tmp,"flow_y_%04d.jpg",int(file_id+offset));
             string filename_y = filename + "/" + tmp;
             cv::Mat cv_img_origin_y = cv::imread(filename_y, CV_LOAD_IMAGE_GRAYSCALE);
-            if (!cv_img_origin_y.data)
-                cv_img_origin_y = cv_last_flow_;
-            else
-                cv_last_flow_ = cv_img_origin_y;
+            if (!cv_img_origin_y.data) {
+                LOG(ERROR) << "Could not load file " << filename_y;
+                return false;
+            }
             if (height > 0 && width > 0)
                 cv::resize(cv_img_origin_y, cv_img_y, cv::Size(width, height));
             else
@@ -471,7 +462,6 @@ bool ReadSegmentFlowToTemporalDatum(const string& filename, const int label,
             }
         }
     }
-
     return true;
 }
 
