@@ -416,9 +416,9 @@ bool ReadSegmentFlowToTemporalDatum(const string& filename, const int label,
     // fill the last image if not enough frames in a video
     cv::Mat cv_last_flow_;
 
-    // saving flow_x components
     for (int i = 0; i < offsets.size(); ++i) {
         int offset = offsets[i];
+        // saving flow_x components
         for (int file_id = 1; file_id < length+1; ++file_id) {
             sprintf(tmp,"flow_x_%04d.jpg",int(file_id+offset));
             string filename_x = filename + "/" + tmp;
@@ -447,11 +447,7 @@ bool ReadSegmentFlowToTemporalDatum(const string& filename, const int label,
                 }
             }
         }
-    }
-
-    // saving flow_y components
-    for (int i = 0; i < offsets.size(); ++i) {
-        int offset = offsets[i];
+        // saving flow_y components
         for (int file_id = 1; file_id < length+1; ++file_id) {
             sprintf(tmp,"flow_y_%04d.jpg",int(file_id+offset));
             string filename_y = filename + "/" + tmp;
@@ -471,7 +467,6 @@ bool ReadSegmentFlowToTemporalDatum(const string& filename, const int label,
             }
         }
     }
-
     return true;
 }
 
