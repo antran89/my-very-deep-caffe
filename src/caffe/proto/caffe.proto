@@ -362,6 +362,7 @@ message LayerParameter {
   optional ArgMaxParameter argmax_param = 103;
   optional BatchNormParameter batch_norm_param = 139;
   optional BiasParameter bias_param = 141;
+  optional BNParameter bn_param = 155;
   optional ConcatParameter concat_param = 104;
   optional ContrastiveLossParameter contrastive_loss_param = 105;
   optional Convolution3DParameter convolution3d_param = 149;
@@ -449,6 +450,19 @@ message VideoDataParameter {
     FOREGROUND_SALIENCY = 2;
   }
   optional Modality modality = 13 [default = FLOW];
+
+  // the name pattern for frame images,
+  // for RGB modality it is default to "img_%04d.jpg", for FLOW "flow_x_%04d" and "flow_y_%04d"
+  optional string name_pattern = 14;
+
+  // The type of input
+  optional bool encoded = 15 [default = false];
+
+  // Extract 10 view features when testing.
+  optional bool test_10view_features = 16 [default = false];
+  // Preserve the temporal order in channels from L frames [N, C, L, H, W]
+  optional bool preserve_temporal = 17 [default = true];
+  optional uint32 prefetch = 18 [default = 4];
 }
 
 // Similar to VideoData, but without random starting frame
@@ -773,6 +787,23 @@ message BatchNormParameter {
   // Small value to add to the variance estimate so that we don't divide by
   // zero.
   optional float eps = 3 [default = 1e-5];
+}
+
+message BNParameter {
+  optional FillerParameter slope_filler = 1;
+  optional FillerParameter bias_filler = 2;
+  optional float momentum = 3 [default = 0.9];
+  optional float eps = 4 [default = 1e-5];
+  // If true, will use the moving average mean and std for training and test.
+  // Will override the lr_param and freeze all the parameters.
+  // Make sure to initialize the layer properly with pretrained parameters.
+  optional bool frozen = 5 [default = false];
+  enum Engine {
+    DEFAULT = 0;
+    CAFFE = 1;
+    CUDNN = 2;
+  }
+  optional Engine engine = 6 [default = DEFAULT];
 }
 
 message BiasParameter {

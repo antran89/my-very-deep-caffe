@@ -4,6 +4,7 @@
 #include "caffe/data_reader.hpp"
 #include "caffe/flow_data_reader.hpp"
 #include "caffe/video_snippet_data_reader.hpp"
+#include "caffe/video_clip_data_reader.hpp"
 #include "caffe/twostream_data_reader.hpp"
 #include "caffe/layers/base_data_layer.hpp"
 #include "caffe/layers/base_twostream_data_layer.hpp"
@@ -101,6 +102,7 @@ template class BlockingQueue<shared_ptr<DataReader::QueuePair> >;
 template class BlockingQueue<shared_ptr<FlowDataReader::QueuePair> >;
 template class BlockingQueue<shared_ptr<TwostreamDataReader::QueuePair> >;
 template class BlockingQueue<shared_ptr<VideoSnippetDataReader::QueuePair> >;
+template class BlockingQueue<shared_ptr<VideoClipDataReader::QueuePair> >;
 template class BlockingQueue<shared_ptr<TwostreamSnippetDataReader::QueuePair> >;
 template class BlockingQueue<P2PSync<float>*>;
 template class BlockingQueue<P2PSync<double>*>;
