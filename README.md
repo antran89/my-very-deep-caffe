@@ -1,8 +1,16 @@
 # Fork of Caffe
 **This is a fork used for video action recognition, mainly two-stream CNN networks.**
+
 Some un-official layers developed or merged into this repo:
-	0. FlowData layer: use a FlowData Reader to read flow data from LDMB database.
-	0. Modified DataTransformer methods: which can read images from resized images, rescale back and then do transformations.
+- FlowData layer: use a FlowData Reader to read flow data from LDMB database.
+- Modified DataTransformer methods: which can read images from resized images, rescale back and then do transformations.
+- 3D convolution/pooling layers. Sofware works well with 3D-CNN network.
+
+We choose to keep our `my-very-deep-caffe` to be aligned with the original of Caffe's fork commit 5a201dd960840c319cefd9fa9e2a40d2c76ddd73. 
+We would like to preserve the strength of BLVC Caffe software which is a deep learning framework made with expression, speed, and modularity 
+in mind. Our software also inherits training mechanism from multiple GPUs from BLVC Caffe.
+
+The examples to use the software available at [two-stream FCAN repository](https://github.com/antran89/two-stream-fcan).
 
 # Caffe
 
